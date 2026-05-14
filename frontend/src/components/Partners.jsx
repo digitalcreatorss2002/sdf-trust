@@ -67,8 +67,8 @@ const PartnersSection = () => {
         </h2>
 
         {renderPartnerGrid("Corporate Partners", partners)}
-        {renderPartnerGrid("Public Partners", publicPartners)}
-        {renderPartnerGrid("Society Partners", societyPartners)}
+        {/* {renderPartnerGrid("Public Partners", publicPartners)}
+        {renderPartnerGrid("Society Partners", societyPartners)} */}
       </div>
     </section>
   );

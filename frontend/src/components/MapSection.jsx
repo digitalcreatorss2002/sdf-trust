@@ -98,7 +98,6 @@ const MapSection = ({ onStateSelect, onDataLoad }) => {
                   };
                 }
                 
-                // Add project uniquely per state
                 if (!projectData[state].list.find(proj => proj.id === p.id)) {
                     projectData[state].list.push(p);
                     projectData[state].totalBeneficiaries += benef;
@@ -110,7 +109,6 @@ const MapSection = ({ onStateSelect, onDataLoad }) => {
               }
             });
           } else {
-            // Fallback for older entries without state_locations JSON
             const states = p.location ? p.location.split(",").map((s) => s.trim()) : [];
             const districts = p.district ? p.district.split(",").map((d) => d.trim()) : [];
             const blocks = p.block ? p.block.split(",").map((b) => b.trim()) : [];
@@ -139,7 +137,6 @@ const MapSection = ({ onStateSelect, onDataLoad }) => {
           }
         });
 
-        // Pass total aggregates back to parent
         if (onDataLoad) {
           const totalProjects = projects.length;
           let totalBeneficiaries = 0;
@@ -197,7 +194,8 @@ const MapSection = ({ onStateSelect, onDataLoad }) => {
             const hasProjects = data.list.length > 0;
 
             if (hasProjects) {
-              layer.bindTooltip(`<div style="display:flex; flex-direction:column; align-items:center; line-height:1.2;"><span>📍</span><span><b>${stateName}</b></span></div>`, {
+              // PIN (📍) REMOVED FROM TOOLTIP
+              layer.bindTooltip(`<div style="display:flex; flex-direction:column; align-items:center; line-height:1.2;"><span><b>${stateName}</b></span></div>`, {
                 permanent: true,
                 direction: "center",
                 className: "custom-tooltip-permanent",
@@ -223,7 +221,6 @@ const MapSection = ({ onStateSelect, onDataLoad }) => {
               click: (e) => {
                 L.DomEvent.stopPropagation(e);
                 if (onStateSelect) {
-                  // Get static data from the mapping
                   const staticInfo = stateDataMap[stateName] || { 
                     image: "https://via.placeholder.com/400x250?text=SDF+Presence", 
                     livesImpacted: "0" 
@@ -287,6 +284,11 @@ const MapSection = ({ onStateSelect, onDataLoad }) => {
             font-size: 0.85rem;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             pointer-events: none;
+        }
+        /* EXTRA SAFETY TO HIDE ANY STATIC PINS/LABELS */
+        .leaflet-marker-icon, 
+        .leaflet-marker-shadow {
+            display: none !important;
         }
       `}</style>
 
