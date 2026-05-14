@@ -37,7 +37,7 @@ const stateDataMap = {
   "Jammu and Kashmir": { image: "/images/states/jk.jpg", livesImpacted: "100k+" }
 };
 
-const MapSection = ({ onStateSelect }) => {
+const MapSection = ({ onStateSelect, onDataLoad }) => {
   const mapRef = useRef(null);
   const geoLayerRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -75,33 +75,98 @@ const MapSection = ({ onStateSelect }) => {
         const projects = result.data || [];
 
         projects.forEach((p) => {
-          const states = p.location ? p.location.split(",").map((s) => s.trim()) : [];
-          const districts = p.district ? p.district.split(",").map((d) => d.trim()) : [];
-          const blocks = p.block ? p.block.split(",").map((b) => b.trim()) : [];
-          const villages = p.village ? p.village.split(",").map((v) => v.trim()) : [];
+          let stateLocations = [];
+          if (p.state_locations) {
+            try {
+              stateLocations = JSON.parse(p.state_locations);
+            } catch(e) {}
+          }
+          
           const benef = parseInt(p.beneficiaries) || 0;
 
-          states.forEach((state) => {
-            if (state) {
-              if (!projectData[state]) {
-                projectData[state] = {
-                  list: [],
-                  districtSet: new Set(),
-                  blockSet: new Set(),
-                  villageSet: new Set(),
-                  totalBeneficiaries: 0
-                };
+          if (stateLocations && stateLocations.length > 0) {
+            stateLocations.forEach(loc => {
+              const state = loc.state ? loc.state.trim() : null;
+              if (state) {
+                if (!projectData[state]) {
+                  projectData[state] = {
+                    list: [],
+                    districtSet: new Set(),
+                    blockSet: new Set(),
+                    villageSet: new Set(),
+                    totalBeneficiaries: 0
+                  };
+                }
+                
+                // Add project uniquely per state
+                if (!projectData[state].list.find(proj => proj.id === p.id)) {
+                    projectData[state].list.push(p);
+                    projectData[state].totalBeneficiaries += benef;
+                }
+                
+                if (loc.district) loc.district.split(",").forEach(d => { if (d.trim()) projectData[state].districtSet.add(d.trim().toLowerCase()); });
+                if (loc.block) loc.block.split(",").forEach(b => { if (b.trim()) projectData[state].blockSet.add(b.trim().toLowerCase()); });
+                if (loc.village) loc.village.split(",").forEach(v => { if (v.trim()) projectData[state].villageSet.add(v.trim().toLowerCase()); });
               }
+            });
+          } else {
+            // Fallback for older entries without state_locations JSON
+            const states = p.location ? p.location.split(",").map((s) => s.trim()) : [];
+            const districts = p.district ? p.district.split(",").map((d) => d.trim()) : [];
+            const blocks = p.block ? p.block.split(",").map((b) => b.trim()) : [];
+            const villages = p.village ? p.village.split(",").map((v) => v.trim()) : [];
 
-              projectData[state].list.push(p);
-              projectData[state].totalBeneficiaries += benef;
+            states.forEach((state) => {
+              if (state) {
+                if (!projectData[state]) {
+                  projectData[state] = {
+                    list: [],
+                    districtSet: new Set(),
+                    blockSet: new Set(),
+                    villageSet: new Set(),
+                    totalBeneficiaries: 0
+                  };
+                }
 
-              districts.forEach(d => { if (d) projectData[state].districtSet.add(d.toLowerCase()); });
-              blocks.forEach(b => { if (b) projectData[state].blockSet.add(b.toLowerCase()); });
-              villages.forEach(v => { if (v) projectData[state].villageSet.add(v.toLowerCase()); });
-            }
-          });
+                projectData[state].list.push(p);
+                projectData[state].totalBeneficiaries += benef;
+
+                districts.forEach(d => { if (d) projectData[state].districtSet.add(d.toLowerCase()); });
+                blocks.forEach(b => { if (b) projectData[state].blockSet.add(b.toLowerCase()); });
+                villages.forEach(v => { if (v) projectData[state].villageSet.add(v.toLowerCase()); });
+              }
+            });
+          }
         });
+
+        // Pass total aggregates back to parent
+        if (onDataLoad) {
+          const totalProjects = projects.length;
+          let totalBeneficiaries = 0;
+          let overallDistricts = new Set();
+          
+          projects.forEach(p => {
+             totalBeneficiaries += parseInt(p.beneficiaries) || 0;
+             let stateLocations = [];
+             try { stateLocations = JSON.parse(p.state_locations || "[]"); } catch(e) {}
+             
+             if(stateLocations.length > 0) {
+                 stateLocations.forEach(loc => {
+                     if (loc.district) loc.district.split(',').forEach(d => { if(d.trim()) overallDistricts.add(d.trim().toLowerCase()); });
+                 });
+             } else {
+                 if (p.district) p.district.split(',').forEach(d => { if(d.trim()) overallDistricts.add(d.trim().toLowerCase()); });
+             }
+          });
+          
+          const activeStatesCount = Object.keys(projectData).length;
+          onDataLoad({
+            totalStates: activeStatesCount,
+            totalDistricts: overallDistricts.size,
+            totalProjects: totalProjects,
+            totalBeneficiaries: totalBeneficiaries
+          });
+        }
 
         const geoRes = await fetch("/india_states.geojson");
         const geoData = await geoRes.json();
@@ -132,7 +197,7 @@ const MapSection = ({ onStateSelect }) => {
             const hasProjects = data.list.length > 0;
 
             if (hasProjects) {
-              layer.bindTooltip(`📍 <b>${stateName}</b>`, {
+              layer.bindTooltip(`<div style="display:flex; flex-direction:column; align-items:center; line-height:1.2;"><span>📍</span><span><b>${stateName}</b></span></div>`, {
                 permanent: true,
                 direction: "center",
                 className: "custom-tooltip-permanent",

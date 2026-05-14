@@ -61,6 +61,12 @@ const Home = () => {
 
   const [focusAreas, setFocusAreas] = useState([]);
   const [selectedMapState, setSelectedMapState] = useState(null);
+  const [mapTotals, setMapTotals] = useState({
+      totalStates: 12,
+      totalDistricts: "45+",
+      totalProjects: "15+",
+      totalBeneficiaries: "2M+"
+  });
 
   const [aboutData, setAboutData] = useState(null);
 
@@ -185,6 +191,12 @@ const Home = () => {
     fetchAboutData();
     fetchRecentProjects(); // Trigger the fetch
   }, []);
+
+  const formatCompact = (num) => {
+      if (!num) return "0";
+      if (typeof num === "string" && num.includes("+")) return num;
+      return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num);
+  };
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -612,7 +624,12 @@ const Home = () => {
                 }}
                 className="bg-accent rounded-xl overflow-hidden shadow-lg"
               >
-                <MapSection onStateSelect={setSelectedMapState} />
+                <MapSection onStateSelect={setSelectedMapState} onDataLoad={(totals) => setMapTotals({
+                    totalStates: totals.totalStates,
+                    totalDistricts: totals.totalDistricts,
+                    totalProjects: totals.totalProjects,
+                    totalBeneficiaries: formatCompact(totals.totalBeneficiaries)
+                })} />
               </motion.div>
             </div>
 
@@ -752,7 +769,7 @@ const Home = () => {
                   <ul className="space-y-7">
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        12
+                        {mapTotals.totalStates}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -765,7 +782,7 @@ const Home = () => {
                     </li>
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        45+
+                        {mapTotals.totalDistricts}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -778,7 +795,7 @@ const Home = () => {
                     </li>
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        15+
+                        {mapTotals.totalProjects}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -791,7 +808,7 @@ const Home = () => {
                     </li>
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        2M+
+                        {mapTotals.totalBeneficiaries}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -811,6 +828,7 @@ const Home = () => {
                     </p>
                   </div>
                 </div>
+
               )}
             </div>
           </div>

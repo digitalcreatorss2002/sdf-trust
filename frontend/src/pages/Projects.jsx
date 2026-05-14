@@ -20,6 +20,18 @@ const Projects = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState("all");
   const [selectedMapState, setSelectedMapState] = useState(null);
+  const [mapTotals, setMapTotals] = useState({
+      totalStates: 12,
+      totalDistricts: "45+",
+      totalProjects: "15+",
+      totalBeneficiaries: "2M+"
+  });
+
+  const formatCompact = (num) => {
+      if (!num) return "0";
+      if (typeof num === "string" && num.includes("+")) return num;
+      return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num);
+  };
 
   const mapRef = useRef(null);
 
@@ -74,11 +86,15 @@ const Projects = () => {
   useEffect(() => {
     if (location.hash) {
       const tab = decodeURIComponent(location.hash.replace("#", ""));
-      setActiveTab(tab);
+      if (tab === "ongoing" || tab === "impact") {
+        setActiveTab("all");
+      } else {
+        setActiveTab(tab);
+      }
     } else {
       setActiveTab("all");
     }
-  }, [location]);
+  }, [location.hash]);
 
   // FETCH DATA
   useEffect(() => {
@@ -123,9 +139,31 @@ const Projects = () => {
 
   // 🔥 EXTRACT UNIQUE CATEGORIES
   const uniqueCategories = [
-    "all",
     ...new Set(projects.map((p) => p.category?.trim()).filter(Boolean)),
   ];
+
+  // 🔥 EXTRACT UNIQUE STATES
+  const uniqueStates = [
+    ...new Set(projects.flatMap(p => {
+      let states = [];
+      try {
+         const locs = JSON.parse(p.state_locations || "[]");
+         states = locs.map(l => l.state?.trim());
+      } catch(e) {}
+      if (states.length === 0 && p.location) {
+         states = p.location.split(',').map(s => s.trim());
+      }
+      return states;
+    }).filter(Boolean))
+  ].sort();
+
+  const [activeState, setActiveState] = useState(uniqueStates.length > 0 ? uniqueStates[0] : null);
+
+  useEffect(() => {
+    if (uniqueStates.length > 0 && !activeState) {
+        setActiveState(uniqueStates[0]);
+    }
+  }, [uniqueStates, activeState]);
 
   // Helper to format tab labels
   const formatTabLabel = (label) => {
@@ -134,9 +172,22 @@ const Projects = () => {
   };
 
   // 🔥 FILTER PROJECTS
-  const displayProjects = activeTab === "all" 
-    ? projects 
-    : projects.filter((p) => p.category?.trim() === activeTab);
+  let displayProjects = projects;
+  if (activeTab === "listings") {
+      displayProjects = projects.filter(p => {
+          let states = [];
+          try {
+             const locs = JSON.parse(p.state_locations || "[]");
+             states = locs.map(l => l.state?.trim());
+          } catch(e) {}
+          if (states.length === 0 && p.location) {
+             states = p.location.split(',').map(s => s.trim());
+          }
+          return states.includes(activeState);
+      });
+  } else if (activeTab !== "all") {
+      displayProjects = projects.filter((p) => p.category?.trim() === activeTab);
+  }
 
   return (
     <div className="bg-bg-color min-h-screen pb-20">
@@ -168,6 +219,32 @@ const Projects = () => {
             ref={scrollRef}
             className="flex items-center space-x-8 overflow-x-auto no-scrollbar scroll-smooth px-12"
           >
+            <button
+              onClick={() => {
+                setActiveTab("all");
+                window.history.replaceState(null, "", `#all`);
+              }}
+              className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${
+                activeTab === "all"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:text-primary"
+              }`}
+            >
+              All Projects 🏢
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab("listings");
+                window.history.replaceState(null, "", `#listings`);
+              }}
+              className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${
+                activeTab === "listings"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:text-primary"
+              }`}
+            >
+              State-wise Listings 📍
+            </button>
             {uniqueCategories.map((cat) => (
               <button
                 key={cat}
@@ -185,6 +262,25 @@ const Projects = () => {
               </button>
             ))}
           </div>
+
+          {/* Sub-navbar for States when 'listings' is active */}
+          {activeTab === "listings" && uniqueStates.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 pb-4 bg-white">
+              {uniqueStates.map(state => (
+                <button
+                  key={state}
+                  onClick={() => setActiveState(state)}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeState === state
+                      ? "bg-[#6a752b] text-white shadow"
+                      : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  {state}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Right Arrow */}
           <button
@@ -280,7 +376,12 @@ const Projects = () => {
                 }}
                 className="bg-accent rounded-xl overflow-hidden shadow-lg"
               >
-                <MapSection onStateSelect={setSelectedMapState} />
+                <MapSection onStateSelect={setSelectedMapState} onDataLoad={(totals) => setMapTotals({
+                    totalStates: totals.totalStates,
+                    totalDistricts: totals.totalDistricts,
+                    totalProjects: totals.totalProjects,
+                    totalBeneficiaries: formatCompact(totals.totalBeneficiaries)
+                })} />
               </motion.div>
             </div>
 
@@ -413,7 +514,7 @@ const Projects = () => {
                   <ul className="space-y-7">
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        12
+                        {mapTotals.totalStates}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -426,7 +527,7 @@ const Projects = () => {
                     </li>
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        45+
+                        {mapTotals.totalDistricts}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -439,7 +540,7 @@ const Projects = () => {
                     </li>
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        15+
+                        {mapTotals.totalProjects}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -452,7 +553,7 @@ const Projects = () => {
                     </li>
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        2M+
+                        {mapTotals.totalBeneficiaries}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
