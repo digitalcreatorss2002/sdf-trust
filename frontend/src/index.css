@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #6F7C2E;
+  --color-secondary: #9DAA3A;
+  --color-accent: #2C8FA3;
+  --color-light-aqua: #6BB9C8;
+  --color-text-primary: #1E1E1E;
+  --color-bg-color: #FAF9F4;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Merriweather', serif;
+}
+
+body {
+  background-color: var(--color-bg-color);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 3.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Hide scrollbar (Chrome, Safari, Edge) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar (Firefox) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* index.css */
+.input {
+  @apply w-full p-4 pl-12 rounded-xl bg-gray-100 text-gray-700 
+  focus:outline-none focus:ring-2 focus:ring-yellow-400 
+  transition duration-200;
+}
+
+.custom-tooltip {
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  max-width: 220px;
+}
+
+.custom-tooltip ul {
+  padding-left: 15px;
+  margin: 5px 0 0;
+}
+
+.custom-tooltip li {
+  font-size: 11px;
+}
+
+.leaflet-interactive {
+  transition: all 0.25s ease;
+}
+
+#map {
+  background: white;
+}
+
+
+/* --- Hide Scrollbar for 'no-scrollbar' class --- */
+
+/* Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Add this to your App.css */
+/* .group\/link span:last-child {
+  text-transform: lowercase;
+} */
+
+
+
+/* Sirf un labels ko capitalize karo jo normal text hain */
+.group\/link span:last-child {
+  /* text-transform ko delete kar dena hi behtar hai */
+  text-transform: none !important; 
+}
+
+
+
+.group\/link span:last-child::first-letter {
+  text-transform: uppercase;
+}
+
+/* Iske bina map 0px height par rehta hai aur dikhta nahi hai */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  min-height: 400px; /* Ya jo bhi height aapko chahiye */
+}
