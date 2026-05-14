@@ -9,12 +9,23 @@ const ProjectSlider = () => {
   const [animate, setAnimate] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 FIXED IMAGE URL HELPER: Matches your working logic
+  const getImageUrl = (path) => {
+    if (!path) return "/banner/fallback.jpg"; 
+    if (path.startsWith('http')) return path;
+
+    // Root domain nikalne ke liye logic (e.g., https://domain.com)
+    const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0]; 
+    const cleanPath = path.replace(/^\/+/, ''); 
+    
+    return `${rootDomain}/${cleanPath}`;
+  };
+
   // 🔥 FETCH PROJECTS
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        // This forces the browser to fetch fresh data from the database every time
-const res = await fetch(`${PROJECTS_API}?t=${new Date().getTime()}`);
+        const res = await fetch(`${PROJECTS_API}?t=${new Date().getTime()}`);
         const data = await res.json();
 
         if (data.status === "success") {
@@ -77,13 +88,10 @@ const res = await fetch(`${PROJECTS_API}?t=${new Date().getTime()}`);
   if (!projects.length) return null;
 
   const project = projects[index];
-  const youtubeSrc = getEmbedUrl(project.youtube); // Assuming you have a youtube column, else ignore
+  const youtubeSrc = getEmbedUrl(project.youtube); 
   
-  // Format the media URL securely
-  const mediaUrl = project.image_url 
-    ? `${ADMIN_BASE_URL}${project.image_url.replace(/^\/+/, '')}` 
-    : "/banner/fallback.jpg";
-
+  // 🔥 UPDATED MEDIA URL USING THE HELPER
+  const mediaUrl = getImageUrl(project.image_url);
   const isVideoFile = isLocalVideo(project.image_url);
 
   return (
@@ -160,6 +168,7 @@ const res = await fetch(`${PROJECTS_API}?t=${new Date().getTime()}`);
                 src={mediaUrl}
                 alt={project.title}
                 className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.src = "/banner/fallback.jpg"; }}
               />
             )}
           </div>

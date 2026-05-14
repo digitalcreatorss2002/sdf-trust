@@ -24,6 +24,18 @@ const isVideoFile = (url) => {
   return /\.(mp4|webm|ogg)$/i.test(url);
 };
 
+// 🔥 FIXED: Direct root extraction to match your working Project details/listing logic
+const getImageUrl = (path) => {
+  if (!path) return "https://via.placeholder.com/800x500?text=No+Image";
+  if (path.startsWith('http')) return path;
+
+  // Root domain nikalne ke liye logic jo aapke projects mein kaam kar raha hai
+  const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0]; 
+  const cleanPath = path.replace(/^\/+/, ''); 
+  
+  return `${rootDomain}/${cleanPath}`;
+};
+
 const makeImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/800x500?text=No+Image";
 
@@ -325,21 +337,6 @@ const Home = () => {
                   : "Established in 2014 by a dedicated group of professional social workers, the Sustainable Development Foundation (SDF) is a distinguished autonomous and 'not-for-profit' organization in India..."}
               </p>
 
-              {/* <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 mr-3 shrink-0"></span>
-                  <span className="text-gray-600 text-sm">
-                    Pesentector tappelpat, euell cocenata velf, colotiut nnos
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 mr-3 shrink-0"></span>
-                  <span className="text-gray-600 text-sm">
-                    Uit fanlis sed dolem frigiats mulit zooflaits veilles
-                  </span>
-                </li>
-              </ul> */}
-
               <Link to="/about">
                 <button className="bg-primary hover:bg-[#5a6425] text-white px-8 py-2.5 rounded-full font-medium transition-colors">
                   View More
@@ -348,57 +345,56 @@ const Home = () => {
             </div>
 
             <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* 🔥 UPDATED: Mapping over dynamic projects instead of static cards */}
+              {/* 🔥 UPDATED: Mapping over dynamic projects with fixed image URL logic */}
               {recentProjects.length > 0 ? (
-                recentProjects.map((project, idx) => (
-                  <div
-                    key={project.id || idx}
-                    className="bg-white rounded-2xl shadow-sm text-center border border-gray-100 pb-6 flex flex-col h-full hover:shadow-md transition-shadow"
-                  >
-                    <div className="p-4 h-40">
-                      {" "}
-                      {/* Fixed height to keep cards aligned */}
-                      {isVideoFile(project.image_url) ? (
-                        <video
-                          src={`${ADMIN_BASE_URL}${project.image_url?.replace(/^\/+/, "")}`}
-                          className="w-full h-full object-cover rounded-xl shadow-sm"
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                        />
-                      ) : (
-                        <img
-                          src={`${ADMIN_BASE_URL}${project.image_url?.replace(/^\/+/, "")}`}
-                          alt={project.title}
-                          className="w-full h-full object-cover rounded-xl shadow-sm"
-                          onError={(e) => {
-                            e.currentTarget.src =
-                              "https://via.placeholder.com/500x300?text=Image+Not+Found";
-                          }}
-                        />
-                      )}
-                    </div>
+                recentProjects.map((project, idx) => {
+                  const finalMediaUrl = getImageUrl(project.image_url);
+                  return (
+                    <div
+                      key={project.id || idx}
+                      className="bg-white rounded-2xl shadow-sm text-center border border-gray-100 pb-6 flex flex-col h-full hover:shadow-md transition-shadow"
+                    >
+                      <div className="p-4 h-40">
+                        {isVideoFile(project.image_url) ? (
+                          <video
+                            src={finalMediaUrl}
+                            className="w-full h-full object-cover rounded-xl shadow-sm"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                          />
+                        ) : (
+                          <img
+                            src={finalMediaUrl}
+                            alt={project.title}
+                            className="w-full h-full object-cover rounded-xl shadow-sm"
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                "https://via.placeholder.com/500x300?text=Image+Not+Found";
+                            }}
+                          />
+                        )}
+                      </div>
 
-                    <div className="p-5 grow flex flex-col">
-                      {/* Truncated title to ensure it doesn't break layout */}
-                      <h3 className="text-xl font-serif text-text-primary mb-3 line-clamp-2">
-                        {project.title}
-                      </h3>
-                      {/* Truncated description */}
-                      <p className="text-gray-500 text-sm mb-6 grow line-clamp-3">
-                        {project.description}
-                      </p>
+                      <div className="p-5 grow flex flex-col">
+                        <h3 className="text-xl font-serif text-text-primary mb-3 line-clamp-2">
+                          {project.title}
+                        </h3>
+                        <p className="text-gray-500 text-sm mb-6 grow line-clamp-3">
+                          {project.description}
+                        </p>
 
-                      <Link
-                        to={`/projectdetails/${project.slug}`}
-                        className="text-primary font-bold text-sm hover:underline mt-auto"
-                      >
-                        View Project →
-                      </Link>
+                        <Link
+                          to={`/projectdetails/${project.slug}`}
+                          className="text-primary font-bold text-sm hover:underline mt-auto"
+                        >
+                          View Project →
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="col-span-3 text-center text-gray-500 py-10">
                   Loading recent projects...
@@ -439,7 +435,6 @@ const Home = () => {
                   initial={{ y: 50, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-                  viewport={{ once: false }}
                   className="bg-white p-6 rounded-3xl shadow-sm hover:-translate-y-2 hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row items-center gap-4 justify-center border border-gray-100"
                 >
                   <div
@@ -544,7 +539,6 @@ const Home = () => {
             "url('https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')",
         }}
       >
-        {/* Elegant Dark Overlay */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 relative">
@@ -605,7 +599,6 @@ const Home = () => {
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            {/* MAP COLUMN */}
             <div
               ref={mapRef}
               className="lg:col-span-2 relative h-150 md:h-200 flex items-center justify-center bg-transparent"
@@ -633,14 +626,12 @@ const Home = () => {
               </motion.div>
             </div>
 
-            {/* SIDEBAR COLUMN: IMPACT SNAPSHOT */}
             <div
               id="impact"
               className="bg-white sticky top-24 rounded-xl shadow-sm border border-gray-100 p-8 min-h-112.5"
             >
               {selectedMapState ? (
                 <div className="animate-in fade-in duration-500">
-                  {/* Header with Title & Reset Button */}
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-serif font-bold text-text-primary flex items-center gap-2">
                       <span className="text-2xl">📊</span> Impact Snapshot
@@ -653,7 +644,6 @@ const Home = () => {
                     </button>
                   </div>
 
-                  {/* State Name Display */}
                   <div className="mb-4">
                     <p className="text-[10px] text-primary font-bold uppercase tracking-widest mb-1">
                       Currently Viewing
@@ -663,7 +653,6 @@ const Home = () => {
                     </h4>
                   </div>
 
-                  {/* 1. STATE STATIC IMAGE (Loaded from JSON config) */}
                   <div className="mb-8 rounded-xl overflow-hidden h-44 bg-gray-100 border border-gray-100 shadow-inner">
                     <img
                       src={
@@ -675,9 +664,7 @@ const Home = () => {
                     />
                   </div>
 
-                  {/* 2. STATS LIST (Directly matched to image_3c0438.png design) */}
                   <ul className="space-y-6">
-                    {/* Districts Operated */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-[#576123]/10 text-[#576123] flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
                         {selectedMapState.districtCount || 0}
@@ -692,7 +679,6 @@ const Home = () => {
                       </div>
                     </li>
 
-                    {/* Blocks Operated */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
                         {selectedMapState.blockCount || 0}
@@ -707,7 +693,6 @@ const Home = () => {
                       </div>
                     </li>
 
-                    {/* Villages Operated */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
                         {selectedMapState.villageCount || 0}
@@ -722,7 +707,6 @@ const Home = () => {
                       </div>
                     </li>
 
-                    {/* Major Projects */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
                         {selectedMapState.projects.length}
@@ -737,7 +721,6 @@ const Home = () => {
                       </div>
                     </li>
 
-                    {/* Lives Impacted (From JSON config) */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
                         {selectedMapState.livesImpacted || "0"}
@@ -753,7 +736,6 @@ const Home = () => {
                     </li>
                   </ul>
 
-                  {/* Footer text */}
                   <div className="mt-8 pt-4 border-t border-gray-50 text-center">
                     <p className="text-[10px] text-gray-400 italic">
                       Regional statistics for {selectedMapState.name}
@@ -761,7 +743,6 @@ const Home = () => {
                   </div>
                 </div>
               ) : (
-                /* DEFAULT VIEW (BEFORE CLICKING) - Exactly as image_3c0438.png */
                 <div>
                   <h3 className="text-xl font-serif font-bold text-text-primary mb-8 flex items-center gap-2">
                     <span className="text-2xl mr-2">📊</span> Impact Snapshot
@@ -786,7 +767,7 @@ const Home = () => {
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
-                          Districts Operated
+                          Districts Covered
                         </div>
                         <div className="text-[11px] text-gray-500 uppercase tracking-tighter">
                           Local Intervention
@@ -828,7 +809,6 @@ const Home = () => {
                     </p>
                   </div>
                 </div>
-
               )}
             </div>
           </div>
@@ -836,7 +816,6 @@ const Home = () => {
       </section>
 
       <PartnersSection />
-      {/* <ProjectMap/>         */}
 
       <section className="py-10 bg-primary/10 border-t border-primary/20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
