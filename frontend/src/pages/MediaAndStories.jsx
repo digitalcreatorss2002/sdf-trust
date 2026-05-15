@@ -119,10 +119,17 @@ const MediaAndStories = () => {
     return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
   };
 
+  // 🔥 FIXED IMAGE URL HELPER: Aligned with Bluehost root structure
   const getImageUrl = (path) => {
-    if (!path) return '';
+    if (!path) return 'https://via.placeholder.com/800x600?text=No+Media';
     if (path.startsWith('http')) return path;
-    return `${ADMIN_BASE_URL}${path.replace(/^\/+/, "")}`;
+
+    // ADMIN_BASE_URL (https://hrntechsolutions.com/backend/admin) se root domain nikalna
+    const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0].replace(/\/+$/, ""); 
+    const cleanPath = path.replace(/^\/+/, ''); 
+    
+    // Path: domain/backend/admin/uploads/...
+    return `${rootDomain}/backend/admin/${cleanPath}`;
   };
 
   // 🔥 Gallery Navigation Handlers

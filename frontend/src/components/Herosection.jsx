@@ -17,6 +17,19 @@ const getYoutubeId = (url) => {
   }
 };
 
+// 🔥 FIXED: Direct root extraction to match your Bluehost structure
+const getMediaUrl = (path) => {
+  if (!path) return "https://via.placeholder.com/150x100?text=No+Image";
+  if (path.startsWith('http')) return path;
+
+  // Root domain nikalne ke liye (ADMIN_BASE_URL split logic)
+  const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0].replace(/\/+$/, ""); 
+  const cleanPath = path.replace(/^\/+/, ''); 
+  
+  // Images backend/admin/uploads/ mein hain
+  return `${rootDomain}/backend/admin/${cleanPath}`;
+};
+
 function Herosection() {
   const [heroCards, setHeroCards] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -73,9 +86,6 @@ function Herosection() {
           <div className="absolute inset-0 bg-gray-900"></div>
         )}
 
-        {/* 💡 BRIGHTNESS CONTROL: 
-            bg-black/20 se video bright dikhegi. 
-            Gradient isliye lagaya hai taaki left side ka text saaf dikhe. */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent"></div>
         <div className="absolute inset-0 bg-black/10"></div> 
       </div>
@@ -134,10 +144,12 @@ function Herosection() {
                   className={`cursor-pointer transition-all duration-500 ease-out rounded-xl overflow-hidden bg-black/40 backdrop-blur-sm ${curveClasses}`}
                 >
                   <img
-                    src={`${ADMIN_BASE_URL}${card?.image_url}`}
+                    /* 🔥 FIXED: Thumbnail path corrected using helper function */
+                    src={getMediaUrl(card?.image_url)}
                     alt={card?.title || "Thumbnail"}
                     className="w-28 md:w-36 aspect-video object-cover"
                     onError={(e) => {
+                      e.currentTarget.onerror = null;
                       e.currentTarget.src =
                         "https://via.placeholder.com/150x100?text=No+Image";
                     }}

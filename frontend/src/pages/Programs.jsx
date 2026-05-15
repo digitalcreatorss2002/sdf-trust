@@ -21,21 +21,24 @@ const Programs = () => {
     }
   }, [location]);
 
-  // FETCH DATA
-  // FETCH DATA
+  // FETCH DATA (Updated to show newest projects first)
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/programs.php?t=${Date.now()}`);
+        const response = await fetch(
+          `${API_BASE_URL}/programs.php?t=${Date.now()}`,
+        );
         if (!response.ok) throw new Error("Failed to fetch programs");
 
         const data = await response.json();
         if (data.status === "success") {
-          setProgramsList(data.data);
+          // 🔥 Reverse array to show newly added items first
+          const sortedData = [...data.data].reverse();
+          setProgramsList(sortedData);
 
-          // 🔥 SET DEFAULT TAB TO FIRST CATEGORY IF NO HASH EXISTS
-          if (!location.hash && data.data.length > 0) {
-            const firstCat = data.data[0].program_id?.trim().toLowerCase();
+          // 🔥 SET DEFAULT TAB TO FIRST CATEGORY OF SORTED LIST
+          if (!location.hash && sortedData.length > 0) {
+            const firstCat = sortedData[0].program_id?.trim().toLowerCase();
             if (firstCat) setActiveTab(firstCat);
           }
         } else {
@@ -55,7 +58,10 @@ const Programs = () => {
     if (scrollRef.current) {
       const { scrollLeft } = scrollRef.current;
       const scrollAmount = 300;
-      const scrollTo = direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
+      const scrollTo =
+        direction === "left"
+          ? scrollLeft - scrollAmount
+          : scrollLeft + scrollAmount;
 
       scrollRef.current.scrollTo({
         left: scrollTo,
@@ -69,7 +75,7 @@ const Programs = () => {
     ...new Set(
       programsList
         .map((p) => p.program_id?.trim().toLowerCase())
-        .filter(Boolean)
+        .filter(Boolean),
     ),
   ];
 
@@ -82,13 +88,17 @@ const Programs = () => {
   // 🔥 FILTER PROGRAMS
   // 🔥 FILTER PROGRAMS (Simplified)
   const displayPrograms = programsList.filter(
-    (p) => (p.program_id || "").toLowerCase().trim() === activeTab.toLowerCase().trim()
+    (p) =>
+      (p.program_id || "").toLowerCase().trim() ===
+      activeTab.toLowerCase().trim(),
   );
 
   if (loading) {
     return (
       <div className="bg-bg-color min-h-screen py-20 flex items-center justify-center">
-        <div className="text-xl text-primary font-bold animate-pulse">Loading Programs...</div>
+        <div className="text-xl text-primary font-bold animate-pulse">
+          Loading Programs...
+        </div>
       </div>
     );
   }
@@ -106,14 +116,16 @@ const Programs = () => {
 
   return (
     <div className="bg-bg-color min-h-screen pb-20">
-
       {/* HEADER SECTION */}
       <section className="bg-secondary text-white py-20 bg-opacity-90 relative">
         <div className="absolute inset-0 z-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000')] bg-cover bg-center"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Our Programmes</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">
+            Our Programmes
+          </h1>
           <p className="text-xl max-w-2xl mx-auto text-green-50">
-            Impact-driven initiatives targeting the most critical challenges facing our communities today.
+            Impact-driven initiatives targeting the most critical challenges
+            facing our communities today.
           </p>
         </div>
       </section>
@@ -121,7 +133,6 @@ const Programs = () => {
       {/* 🔥 TABS SECTION WITH ARROWS */}
       <section className="border-b sticky top-20 bg-white z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative group">
-
           {/* Left Arrow Button */}
           <button
             onClick={() => scroll("left")}
@@ -144,10 +155,11 @@ const Programs = () => {
                   window.history.replaceState(null, "", `#${tabId}`);
                 }}
                 /* shrink-0 is vital so the text doesn't squash */
-                className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === tabId
+                className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${
+                  activeTab === tabId
                     ? "border-primary text-primary"
                     : "border-transparent text-gray-500 hover:text-primary"
-                  }`}
+                }`}
               >
                 {formatTabLabel(tabId)}
               </button>
@@ -161,14 +173,12 @@ const Programs = () => {
           >
             <span className="text-lg">❯</span>
           </button>
-
         </div>
       </section>
 
       {/* CONTENT GRID */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
           {displayPrograms.length === 0 && (
             <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl shadow-sm border border-gray-100">
               No programs found for this category.
@@ -183,10 +193,18 @@ const Programs = () => {
             >
               <div className="h-48 overflow-hidden">
                 <img
-                  src={`${ADMIN_BASE_URL}${program.image_url}`}
+                  src={
+                    program.image_url?.startsWith("http")
+                      ? program.image_url
+                      : `https://hrntechsolutions.com/backend/admin/${program.image_url}`
+                  }
                   alt={program.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/400x300?text=No+Image" }}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src =
+                      "https://placehold.co/600x400?text=SDF+Program";
+                  }}
                 />
               </div>
 

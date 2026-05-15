@@ -8,7 +8,8 @@ import { motion, useScroll, useTransform, useMotionTemplate } from "framer-motio
 // Video Checker Helper
 const isVideoFile = (url) => {
   if (!url) return false;
-  return /\.(mp4|webm|ogg)$/i.test(url);
+  const cleanUrl = url.split('?')[0];
+  return /\.(mp4|webm|ogg)$/i.test(cleanUrl);
 };
 
 const Projects = () => {
@@ -27,21 +28,22 @@ const Projects = () => {
       totalBeneficiaries: "2M+"
   });
 
-  // 🔥 FIXED IMAGE URL HELPER: Direct root extraction from API_BASE_URL
- const getImageUrl = (path) => {
-  if (!path) return "/local-placeholder.png"; // Public folder mein ye image honi chahiye
-  
-  if (path.startsWith('http')) return path;
+  // 🔥 UPDATED IMAGE URL HELPER: Aligned with Bluehost backend/admin/uploads structure
+  const getImageUrl = (path) => {
+    if (!path) return "https://placehold.co/600x400?text=No+Media";
+    
+    if (path.startsWith('http')) return path;
 
-  // Agar path "uploads/projects/..." se shuru ho raha hai
-  // Toh hum root domain (e.g., https://hrntechsolutions.com) ke baad usey lagayenge
-  const cleanPath = path.replace(/^\/+/, ''); // Shuruat ka slash hatane ke liye
-  
-  // ADMIN_BASE_URL se '/backend/admin' hata kar root domain nikalne ka sabse sahi tarika:
-  const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0]; 
-  
-  return `${rootDomain}/${cleanPath}`;
-};
+    // ADMIN_BASE_URL (https://hrntechsolutions.com/backend/admin) se root nikalna
+    const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0].replace(/\/+$/, ""); 
+    
+    // Path clean karna (shuruat ke slashes hatana)
+    const cleanPath = path.replace(/^\/+/, ""); 
+    
+    // Final URL: Root + backend/admin + uploads path
+    // Kyunki aapki images 'backend/admin/uploads/projects/' mein hain
+    return `${rootDomain}/backend/admin/${cleanPath}`;
+  };
 
   const formatCompact = (num) => {
       if (!num) return "0";
@@ -228,59 +230,59 @@ const Projects = () => {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-    {isLoading ? (
-      <div className="col-span-2 py-12 text-center text-gray-500 flex flex-col items-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-        Loading active projects...
-      </div>
-    ) : error ? (
-      <div className="col-span-2 py-8 px-6 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center">⚠️ {error}</div>
-    ) : displayProjects.length === 0 ? (
-      <div className="col-span-2 py-12 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">No projects found.</div>
-    ) : (
-      displayProjects.map((project) => {
-        const finalImgUrl = getImageUrl(project.image_url);
-        
-        return (
-          <div key={project.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
-            <div className="w-full md:w-48 h-48 shrink-0">
-              {isVideoFile(project.image_url) ? (
-                <video 
-                  src={finalImgUrl} 
-                  className="w-full h-full object-cover rounded-lg" 
-                  autoPlay loop muted playsInline 
-                />
-              ) : (
-                <img 
-                  src={finalImgUrl} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover rounded-lg" 
-                  onError={(e) => {
-                    console.log("Failed to load image at:", finalImgUrl);
-                    e.target.onerror = null; // Infinite loop rokne ke liye
-                    e.target.src = "https://via.placeholder.com/400x300?text=Image+Not+Found";
-                  }} 
-                />
-              )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {isLoading ? (
+            <div className="col-span-2 py-12 text-center text-gray-500 flex flex-col items-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              Loading active projects...
             </div>
-            <div className="flex flex-col">
-              <div className="text-xs font-bold text-accent uppercase tracking-wider mb-2">{project.category}</div>
-              <h3 className="text-2xl font-serif font-bold text-text-primary mb-2 leading-tight">{project.title}</h3>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project.description}</p>
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-4 mt-auto">
-                <span className="text-base">📍</span> {project.location}
-              </div>
-              <Link to={`/projectdetails/${project.slug}`} className="inline-block bg-primary hover:bg-[#5a6425] text-white px-5 py-2 rounded font-medium text-sm transition-colors text-center self-start">
-                View Details
-              </Link>
-            </div>
-          </div>
-        );
-      })
-    )}
-  </div>
-</section>
+          ) : error ? (
+            <div className="col-span-2 py-8 px-6 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center">⚠️ {error}</div>
+          ) : displayProjects.length === 0 ? (
+            <div className="col-span-2 py-12 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">No projects found.</div>
+          ) : (
+            displayProjects.map((project) => {
+              const finalMediaUrl = getImageUrl(project.image_url);
+              const isVideo = isVideoFile(project.image_url);
+              
+              return (
+                <div key={project.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row gap-6 hover:shadow-md transition-shadow">
+                  <div className="w-full md:w-48 h-48 shrink-0 overflow-hidden rounded-lg bg-gray-50">
+                    {isVideo ? (
+                      <video 
+                        src={finalMediaUrl} 
+                        className="w-full h-full object-cover" 
+                        autoPlay loop muted playsInline 
+                      />
+                    ) : (
+                      <img 
+                        src={finalMediaUrl} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
+                        onError={(e) => {
+                          e.target.onerror = null; 
+                          e.target.src = "https://placehold.co/600x400?text=Media+Not+Found";
+                        }} 
+                      />
+                    )}
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <div className="text-[10px] font-bold text-accent uppercase tracking-widest mb-2">{project.category}</div>
+                    <h3 className="text-2xl font-serif font-bold text-text-primary mb-2 leading-tight">{project.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project.description}</p>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-4 mt-auto">
+                      <span className="text-base">📍</span> {project.location}
+                    </div>
+                    <Link to={`/projectdetails/${project.slug}`} className="inline-block bg-primary hover:bg-[#5a6425] text-white px-5 py-2 rounded font-medium text-sm transition-colors text-center self-start shadow-sm">
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </section>
 
       <section id="listings" className="py-16 bg-bg-color">
         <div className="max-w-7xl mx-auto px-4">
@@ -308,7 +310,7 @@ const Projects = () => {
                     <h4 className="text-2xl font-serif font-bold text-text-primary">📍 {selectedMapState.name}</h4>
                   </div>
                   <div className="mb-8 rounded-xl overflow-hidden h-44 bg-gray-100 border border-gray-100 shadow-inner">
-                    <img src={stateStaticData[selectedMapState.name]?.image || "https://via.placeholder.com/400x250?text=SDF+Impact"} alt={selectedMapState.name} className="w-full h-full object-cover" />
+                    <img src={stateStaticData[selectedMapState.name]?.image || "https://placehold.co/600x400?text=SDF+Impact"} alt={selectedMapState.name} className="w-full h-full object-cover" />
                   </div>
                   <ul className="space-y-6">
                     <li className="flex items-center gap-4 group">

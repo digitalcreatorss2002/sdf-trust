@@ -27,27 +27,18 @@ const isVideoFile = (url) => {
 // 🔥 FIXED: Direct root extraction to match your working Project details/listing logic
 const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/800x500?text=No+Image";
-  if (path.startsWith('http')) return path;
+  if (path.startsWith("http")) return path;
 
   // Root domain nikalne ke liye logic jo aapke projects mein kaam kar raha hai
-  const rootDomain = ADMIN_BASE_URL.split('/backend/admin')[0]; 
-  const cleanPath = path.replace(/^\/+/, ''); 
-  
-  return `${rootDomain}/${cleanPath}`;
-};
+  // ADMIN_BASE_URL: https://hrntechsolutions.com/backend/admin
+  const rootDomain = ADMIN_BASE_URL.split("/backend/admin")[0].replace(
+    /\/+$/,
+    "",
+  );
+  const cleanPath = path.replace(/^\/+/, "");
 
-const makeImageUrl = (path) => {
-  if (!path) return "https://via.placeholder.com/800x500?text=No+Image";
-
-  if (typeof path !== "string") {
-    return "https://via.placeholder.com/800x500?text=No+Image";
-  }
-
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-
-  return `${ADMIN_BASE_URL}${path.replace(/^\/+/, "")}`;
+  // Images are in backend/admin/uploads/
+  return `${rootDomain}/backend/admin/${cleanPath}`;
 };
 
 const createSlug = (text) => {
@@ -74,10 +65,10 @@ const Home = () => {
   const [focusAreas, setFocusAreas] = useState([]);
   const [selectedMapState, setSelectedMapState] = useState(null);
   const [mapTotals, setMapTotals] = useState({
-      totalStates: 12,
-      totalDistricts: "45+",
-      totalProjects: "15+",
-      totalBeneficiaries: "2M+"
+    totalStates: 12,
+    totalDistricts: "45+",
+    totalProjects: "15+",
+    totalBeneficiaries: "2M+",
   });
 
   const [aboutData, setAboutData] = useState(null);
@@ -138,7 +129,7 @@ const Home = () => {
             id: program.id || index + 1,
             title: program.title || "Untitled Program",
             description: program.description || "No description available.",
-            image_url: makeImageUrl(program.image_url),
+            image_url: program.image_url, // Path will be processed in render
             slug:
               program.slug ||
               createSlug(program.title) ||
@@ -205,9 +196,12 @@ const Home = () => {
   }, []);
 
   const formatCompact = (num) => {
-      if (!num) return "0";
-      if (typeof num === "string" && num.includes("+")) return num;
-      return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(num);
+    if (!num) return "0";
+    if (typeof num === "string" && num.includes("+")) return num;
+    return new Intl.NumberFormat("en-US", {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(num);
   };
 
   const handleSubscribe = async (e) => {
@@ -478,14 +472,15 @@ const Home = () => {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {programsList.map((program) => (
+                {/* Yahan [...programsList].reverse() add kiya gaya hai */}
+                {[...programsList].reverse().map((program) => (
                   <div
                     key={program.id}
                     className="bg-white rounded-xl border border-gray-100 text-left hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full"
                   >
                     <div className="h-48 overflow-hidden relative">
                       <img
-                        src={program.image_url}
+                        src={getImageUrl(program.image_url)}
                         alt={program.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -617,12 +612,19 @@ const Home = () => {
                 }}
                 className="bg-accent rounded-xl overflow-hidden shadow-lg"
               >
-                <MapSection onStateSelect={setSelectedMapState} onDataLoad={(totals) => setMapTotals({
-                    totalStates: totals.totalStates,
-                    totalDistricts: totals.totalDistricts,
-                    totalProjects: totals.totalProjects,
-                    totalBeneficiaries: formatCompact(totals.totalBeneficiaries)
-                })} />
+                <MapSection
+                  onStateSelect={setSelectedMapState}
+                  onDataLoad={(totals) =>
+                    setMapTotals({
+                      totalStates: totals.totalStates,
+                      totalDistricts: totals.totalDistricts,
+                      totalProjects: totals.totalProjects,
+                      totalBeneficiaries: formatCompact(
+                        totals.totalBeneficiaries,
+                      ),
+                    })
+                  }
+                />
               </motion.div>
             </div>
 

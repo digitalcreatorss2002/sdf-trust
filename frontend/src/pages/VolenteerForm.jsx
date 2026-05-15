@@ -8,6 +8,7 @@ export default function VolunteerForm() {
     phone: "",
     age: "",
     address: "",
+    pincode: "", // Added pincode to state
     interest: "",
     message: "",
   });
@@ -40,11 +41,11 @@ export default function VolunteerForm() {
 
       if (response.ok && data.status === "success") {
         setStatus({ type: "success", message: data.message });
-        setFormData({ name: "", email: "", phone: "", age: "", address: "", interest: "", message: "" });
+        // Resetting form with correct keys
+        setFormData({ name: "", email: "", phone: "", age: "", address: "", pincode: "", interest: "", message: "" });
       } else {
         setStatus({ type: "error", message: data.message || "Failed to submit application." });
       }
-    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       setStatus({ type: "error", message: "Network error. Please try again later." });
     } finally {
@@ -80,7 +81,7 @@ export default function VolunteerForm() {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              className="input"
+              className="input w-full p-2 border rounded-lg"
               required
             />
           </div>
@@ -95,7 +96,7 @@ export default function VolunteerForm() {
                 placeholder="Enter email"
                 value={formData.email}
                 onChange={handleChange}
-                className="input"
+                className="input w-full p-2 border rounded-lg"
                 required
               />
             </div>
@@ -103,12 +104,12 @@ export default function VolunteerForm() {
             <div>
               <label className="block mb-1 font-medium">Phone</label>
               <input
-                type="text"
+                type="tel" // Use tel for phone numbers
                 name="phone"
                 placeholder="Enter phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="input"
+                className="input w-full p-2 border rounded-lg"
                 required
               />
             </div>
@@ -124,11 +125,10 @@ export default function VolunteerForm() {
                 placeholder="Enter age"
                 value={formData.age}
                 onChange={handleChange}
-                className="input"
+                className="input w-full p-2 border rounded-lg"
                 required
               />
             </div>
-
 
             <div>
               <label className="block mb-1 font-medium">Area of Interest</label>
@@ -136,7 +136,7 @@ export default function VolunteerForm() {
                 name="interest"
                 value={formData.interest}
                 onChange={handleChange}
-                className="input"
+                className="input w-full p-2 border rounded-lg"
                 required
               >
                 <option value="">Select</option>
@@ -148,34 +148,33 @@ export default function VolunteerForm() {
             </div>
           </div>
 
-          {/* Address */}
+          {/* Address + Pincode */}
           <div className="grid md:grid-cols-2 gap-4">
-          <div className="max-w-5xl"> 
-            <label className="block mb-1 font-medium">Full Address</label>
-            <input
-              name="address"
-              placeholder="Enter your complete address"
-              value={formData.address}
-              onChange={handleChange}
-              className="input"
-              required
-            ></input>
+            <div> 
+              <label className="block mb-1 font-medium">Full Address</label>
+              <input
+                type="text"
+                name="address"
+                placeholder="Enter your complete address"
+                value={formData.address}
+                onChange={handleChange}
+                className="input w-full p-2 border rounded-lg"
+                required
+              />
             </div>
 
             <div>
               <label className="block mb-1 font-medium">Pincode</label>
               <input
-                type="pincode"
-                name="age"
+                type="text" // Use text or number
+                name="pincode" // Changed from age to pincode
                 placeholder="Enter Pincode"
-                value={formData.age}
+                value={formData.pincode} // Corrected state link
                 onChange={handleChange}
-                className="input"
+                className="input w-full p-2 border rounded-lg"
                 required
               />
             </div>
-
-
           </div>
 
           {/* Message */}
@@ -186,7 +185,7 @@ export default function VolunteerForm() {
               placeholder="Why do you want to volunteer?"
               value={formData.message}
               onChange={handleChange}
-              className="input h-28 resize-none"
+              className="input w-full p-2 border rounded-lg h-28 resize-none"
             ></textarea>
           </div>
 
@@ -196,7 +195,7 @@ export default function VolunteerForm() {
             disabled={isSubmitting}
             className={`w-full py-3 rounded-full font-semibold transition text-white ${isSubmitting ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
           >
-            {isSubmitting ? "Submitting..." : "Submit Application →"}
+            {isSubmitting ? "Subscribing..." : "Submit Application →"}
           </button>
         </form>
       </div>

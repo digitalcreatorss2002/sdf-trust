@@ -66,33 +66,53 @@
 
 
 
-
 import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL, ADMIN_BASE_URL } from "../config";
 
-function Testimonials() { // Removed props, we fetch inside now
+function Testimonials() {
   const [testimonials, setTestimonials] = useState([]);
   const scrollRef = useRef();
+
+  // 🔥 FIXED: Direct root extraction logic for Bluehost
+  const getImageUrl = (path) => {
+    if (!path) return "https://placehold.co/150x150?text=SDF";
+    if (path.startsWith("http")) return path;
+
+    // ADMIN_BASE_URL (https://hrntechsolutions.com/backend/admin) se root nikalna
+    const rootDomain = ADMIN_BASE_URL.split("/backend/admin")[0].replace(/\/+$/, "");
+    const cleanPath = path.replace(/^\/+/, "");
+
+    // Path structure: domain/backend/admin/uploads/...
+    return `${rootDomain}/backend/admin/${cleanPath}`;
+  };
 
   // 1. Fetch data from PHP
   useEffect(() => {
     fetch(`${API_BASE_URL}/testimonial.php?t=${Date.now()}`)
-      .then(res => res.json())
-      .then(data => setTestimonials(data))
-      .catch(err => console.error("Error loading stories:", err));
+      .then((res) => res.json())
+      .then((data) => {
+        // Checking if data is coming correctly
+        if (data.status === "success") {
+          setTestimonials(data.data);
+        } else if (Array.isArray(data)) {
+          setTestimonials(data);
+        }
+      })
+      .catch((err) => console.error("Error loading stories:", err));
   }, []);
 
-  // 2. Your Auto-Scroll Animation Logic
+  // 2. Auto-Scroll Animation Logic
   useEffect(() => {
     const container = scrollRef.current;
-    if (!container || testimonials.length === 0) return; // Don't scroll if empty
+    if (!container || testimonials.length === 0) return;
 
     let animationFrame;
     const speed = 0.5;
 
     const scroll = () => {
       container.scrollLeft += speed;
-      if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+      // Restart scroll when it reaches the end
+      if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
         container.scrollLeft = 0;
       }
       animationFrame = requestAnimationFrame(scroll);
@@ -100,30 +120,40 @@ function Testimonials() { // Removed props, we fetch inside now
 
     animationFrame = requestAnimationFrame(scroll);
     return () => cancelAnimationFrame(animationFrame);
-  }, [testimonials]); // Re-run when testimonials are loaded
+  }, [testimonials]);
 
   return (
     <section className="py-10 bg-white">
       <div className="max-w-7xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-serif mb-10">Stories of Impact</h2>
-        <div ref={scrollRef} className="flex gap-6 overflow-x-auto scrollbar-hide pb-8">
+        
+        <div 
+          ref={scrollRef} 
+          className="flex gap-6 overflow-x-auto no-scrollbar pb-8 cursor-grab active:cursor-grabbing"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {testimonials.map((item, index) => {
-            let imgSrc = item.image;
-            if (imgSrc && !imgSrc.startsWith("http")) {
-              imgSrc = `${ADMIN_BASE_URL}${imgSrc}`;
-            }
-            if (!imgSrc) imgSrc = 'https://via.placeholder.com/150';
+            // FIXED: Using helper for image path
+            const imgSrc = getImageUrl(item.image);
 
             return (
-              <div key={index} className="min-w-75 bg-gray-100 p-6 rounded-2xl flex gap-4 text-left">
+              <div 
+                key={item.id || index} 
+                className="min-w-[300px] md:min-w-[350px] bg-gray-50 p-6 rounded-2xl flex gap-4 text-left border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+              >
                 <img 
                   src={imgSrc} 
-                  className="w-16 h-16 rounded-full object-cover shrink-0" 
+                  alt={item.name}
+                  className="w-16 h-16 rounded-full object-cover shrink-0 border-2 border-primary/10" 
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "https://placehold.co/150x150?text=No+User";
+                  }}
                 />
                 <div>
-                  <p className="text-sm italic mb-2">"{item.message}"</p>
-                  <h4 className="font-bold text-sm">{item.name}</h4>
-                  <p className="text-xs text-gray-500">{item.title}</p>
+                  <p className="text-sm italic mb-2 text-gray-600">"{item.message}"</p>
+                  <h4 className="font-bold text-sm text-text-primary">{item.name}</h4>
+                  <p className="text-[10px] uppercase font-bold text-primary tracking-wider">{item.title}</p>
                 </div>
               </div>
             );
