@@ -10,7 +10,9 @@ const Navbar = () => {
   // ✅ Fix for (EOI/RFQ) capitalization - Regex handles any case variation
   const formatLabel = (label) => {
     if (!label) return "";
-    return label.replace(/\(eoi\/rfq\)/gi, "(EOI/RFQ)");
+    // Program ID format ko readable banana (e.g., lowercase dashes to uppercase/spaces)
+    let formatted = label.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    return formatted.replace(/\(eoi\/rfq\)/gi, "(EOI/RFQ)");
   };
 
   useEffect(() => {
@@ -24,12 +26,13 @@ const Navbar = () => {
           const uniquePrograms = [];
           const seen = new Set();
           for (const prog of data.data) {
-            const normalizedId = (prog.program_id || "").toLowerCase().trim();
-            if (!seen.has(normalizedId)) {
-              seen.add(normalizedId);
+            const normalizedId = (prog.program_id || "").trim();
+            if (normalizedId && !seen.has(normalizedId.toLowerCase())) {
+              seen.add(normalizedId.toLowerCase());
               uniquePrograms.push({
-                label: prog.title,
-                path: `/programs?filter=${encodeURIComponent(normalizedId)}`,
+                // 🔥 FIXED: Title ki jagah ab Program ID select ho raha hai dropdown label ke liye
+                label: normalizedId, 
+                path: `/programs?filter=${encodeURIComponent(normalizedId.toLowerCase())}`,
                 icon: prog.icon || "📌",
               });
             }
@@ -131,7 +134,6 @@ const Navbar = () => {
           path: "/get-involved#funds",
           icon: "🌱",
         },
-        // { label: "Contact Us", path: "/contact", icon: "📞" },
       ],
     },
     {
