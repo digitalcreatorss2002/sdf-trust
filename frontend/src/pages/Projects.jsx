@@ -28,6 +28,9 @@ const Projects = () => {
       totalBeneficiaries: "2M+"
   });
 
+  // Unique Category state management for the sub-menu selection
+  const [selectedCategory, setSelectedCategory] = useState("all-categories");
+
   // 🔥 UPDATED IMAGE URL HELPER: Aligned with Bluehost backend/admin/uploads structure
   const getImageUrl = (path) => {
     if (!path) return "https://placehold.co/600x400?text=No+Media";
@@ -176,8 +179,13 @@ const Projects = () => {
     return label.replace(/[_-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
+  // Filtering Logic Update
   let displayProjects = projects;
-  if (activeTab === "listings") {
+  if (activeTab === "all") {
+      if (selectedCategory !== "all-categories") {
+          displayProjects = projects.filter((p) => p.category?.trim() === selectedCategory);
+      }
+  } else if (activeTab === "listings") {
       displayProjects = projects.filter(p => {
           let states = [];
           try {
@@ -189,7 +197,7 @@ const Projects = () => {
           }
           return states.includes(activeState);
       });
-  } else if (activeTab !== "all") {
+  } else {
       displayProjects = projects.filter((p) => p.category?.trim() === activeTab);
   }
 
@@ -210,14 +218,26 @@ const Projects = () => {
             <span>❮</span>
           </button>
           <div ref={scrollRef} className="flex items-center space-x-8 overflow-x-auto no-scrollbar scroll-smooth px-12">
-            <button onClick={() => { setActiveTab("all"); window.history.replaceState(null, "", `#all`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "all" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>All Projects 🏢</button>
+            <button onClick={() => { setActiveTab("all"); setSelectedCategory("all-categories"); window.history.replaceState(null, "", `#all`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "all" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>All Projects 🏢</button>
             <button onClick={() => { setActiveTab("listings"); window.history.replaceState(null, "", `#listings`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "listings" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>State-wise Listings 📍</button>
             {uniqueCategories.map((cat) => (
               <button key={cat} onClick={() => { setActiveTab(cat); window.history.replaceState(null, "", `#${cat}`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === cat ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>{formatTabLabel(cat)}</button>
             ))}
           </div>
+
+          {/* New Sub-menu: Category list under "All Projects" */}
+          {activeTab === "all" && uniqueCategories.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 pb-4 bg-white border-t pt-2 border-gray-50">
+              <button onClick={() => setSelectedCategory("all-categories")} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === "all-categories" ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>All Categories</button>
+              {uniqueCategories.map(cat => (
+                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === cat ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>{formatTabLabel(cat)}</button>
+              ))}
+            </div>
+          )}
+
+          {/* Existing State List under "State-wise Listings" */}
           {activeTab === "listings" && uniqueStates.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 pb-4 bg-white">
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 pb-4 bg-white border-t pt-2 border-gray-50">
               {uniqueStates.map(state => (
                 <button key={state} onClick={() => setActiveState(state)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeState === state ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>{state}</button>
               ))}
