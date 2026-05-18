@@ -28,8 +28,8 @@ const Projects = () => {
       totalBeneficiaries: "2M+"
   });
 
-  // Unique Category state management for the sub-menu selection
-  const [selectedCategory, setSelectedCategory] = useState("all-categories");
+  // Category state under "All Projects" - defaults to null to show all projects initially
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // 🔥 UPDATED IMAGE URL HELPER: Aligned with Bluehost backend/admin/uploads structure
   const getImageUrl = (path) => {
@@ -44,7 +44,6 @@ const Projects = () => {
     const cleanPath = path.replace(/^\/+/, ""); 
     
     // Final URL: Root + backend/admin + uploads path
-    // Kyunki aapki images 'backend/admin/uploads/projects/' mein hain
     return `${rootDomain}/backend/admin/${cleanPath}`;
   };
 
@@ -148,6 +147,7 @@ const Projects = () => {
     }
   };
 
+  // Dynamically pulls unique categories from backend projects
   const uniqueCategories = [
     ...new Set(projects.map((p) => p.category?.trim()).filter(Boolean)),
   ];
@@ -175,14 +175,13 @@ const Projects = () => {
   }, [uniqueStates, activeState]);
 
   const formatTabLabel = (label) => {
-    if (label === "all") return "All Projects 🏢";
     return label.replace(/[_-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  // Filtering Logic Update
+  // Updated Filter Logic based on sub-menu selection
   let displayProjects = projects;
   if (activeTab === "all") {
-      if (selectedCategory !== "all-categories") {
+      if (selectedCategory) {
           displayProjects = projects.filter((p) => p.category?.trim() === selectedCategory);
       }
   } else if (activeTab === "listings") {
@@ -197,8 +196,6 @@ const Projects = () => {
           }
           return states.includes(activeState);
       });
-  } else {
-      displayProjects = projects.filter((p) => p.category?.trim() === activeTab);
   }
 
   return (
@@ -217,32 +214,31 @@ const Projects = () => {
           <button onClick={() => scroll("left")} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 shadow-lg rounded-full hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 hidden md:flex items-center justify-center w-10 h-10 border border-gray-100">
             <span>❮</span>
           </button>
-          <div ref={scrollRef} className="flex items-center space-x-8 overflow-x-auto no-scrollbar scroll-smooth px-12">
-            <button onClick={() => { setActiveTab("all"); setSelectedCategory("all-categories"); window.history.replaceState(null, "", `#all`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "all" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>All Projects 🏢</button>
+          
+          {/* Main Top Navigation Header */}
+          <div ref={scrollRef} className="flex items-center justify-center space-x-8 overflow-x-auto no-scrollbar scroll-smooth px-12">
+            <button onClick={() => { setActiveTab("all"); setSelectedCategory(null); window.history.replaceState(null, "", `#all`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "all" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>All Projects 🏢</button>
             <button onClick={() => { setActiveTab("listings"); window.history.replaceState(null, "", `#listings`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "listings" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>State-wise Listings 📍</button>
-            {uniqueCategories.map((cat) => (
-              <button key={cat} onClick={() => { setActiveTab(cat); window.history.replaceState(null, "", `#${cat}`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === cat ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>{formatTabLabel(cat)}</button>
-            ))}
           </div>
 
-          {/* New Sub-menu: Category list under "All Projects" */}
+          {/* Sub-menu Row: Shows ONLY core dynamic categories (No "All Projects" button here) */}
           {activeTab === "all" && uniqueCategories.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 pb-4 bg-white border-t pt-2 border-gray-50">
-              <button onClick={() => setSelectedCategory("all-categories")} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === "all-categories" ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>All Categories</button>
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-2 pb-4 bg-white border-t pt-3 border-gray-50 animate-in fade-in duration-300">
               {uniqueCategories.map(cat => (
-                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === cat ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>{formatTabLabel(cat)}</button>
+                <button key={cat} onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === cat ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>{formatTabLabel(cat)}</button>
               ))}
             </div>
           )}
 
-          {/* Existing State List under "State-wise Listings" */}
+          {/* Sub-menu Row: States show here ONLY when "State-wise Listings" is active */}
           {activeTab === "listings" && uniqueStates.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 pb-4 bg-white border-t pt-2 border-gray-50">
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-2 pb-4 bg-white border-t pt-3 border-gray-50 animate-in fade-in duration-300">
               {uniqueStates.map(state => (
                 <button key={state} onClick={() => setActiveState(state)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeState === state ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>{state}</button>
               ))}
             </div>
           )}
+          
           <button onClick={() => scroll("right")} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white p-2 shadow-lg rounded-full hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 hidden md:flex items-center justify-center w-10 h-10 border border-gray-100">
             <span>❯</span>
           </button>
@@ -361,6 +357,18 @@ const Projects = () => {
                         <div className="text-[11px] text-gray-400 uppercase font-bold tracking-tighter">Active Currently</div>
                       </div>
                     </li>
+                    
+                    {/* 🔥 Added: Total Complete Projects for Selected State View */}
+                    <li className="flex items-center gap-4 group">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
+                        {selectedMapState.completedProjectCount || selectedMapState.projects.filter(p => p.status === 'completed' || p.is_completed).length || 0}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">Total Complete Projects</div>
+                        <div className="text-[11px] text-gray-400 uppercase font-bold tracking-tighter">Successfully Delivered</div>
+                      </div>
+                    </li>
+
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">{selectedMapState.livesImpacted || "0"}</div>
                       <div>
@@ -389,6 +397,13 @@ const Projects = () => {
                       <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">{mapTotals.totalProjects}</div>
                       <div><div className="text-sm font-bold text-gray-800">Major Projects</div><div className="text-[11px] text-gray-500 uppercase tracking-tighter">Active Currently</div></div>
                     </li>
+
+                    {/* 🔥 Added: Total Complete Projects for National/Default View */}
+                    <li className="flex items-center gap-4 group">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">{mapTotals.totalCompletedProjects || "35+"}</div>
+                      <div><div className="text-sm font-bold text-gray-800">Total Complete Projects</div><div className="text-[11px] text-gray-500 uppercase tracking-tighter">Successfully Delivered</div></div>
+                    </li>
+
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">{mapTotals.totalBeneficiaries}</div>
                       <div><div className="text-sm font-bold text-gray-800">Lives Impacted</div><div className="text-[11px] text-gray-500 uppercase tracking-tighter">Total Beneficiaries</div></div>
