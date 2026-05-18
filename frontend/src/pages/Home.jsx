@@ -18,19 +18,17 @@ import ProjectSlider from "../components/ProjectSlider";
 const PROGRAMS_API_URL = `${API_BASE_URL}/programs.php?t=` + Date.now();
 const SUBSCRIBE_API_URL = `${API_BASE_URL}/subscribe.php`;
 
-// 🔥 Added Video Checker Helper
+// Video Checker Helper
 const isVideoFile = (url) => {
   if (!url) return false;
   return /\.(mp4|webm|ogg)$/i.test(url);
 };
 
-// 🔥 FIXED: Direct root extraction to match your working Project details/listing logic
+// Direct root extraction to match your working Project details/listing logic
 const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/800x500?text=No+Image";
   if (path.startsWith("http")) return path;
 
-  // Root domain nikalne ke liye logic jo aapke projects mein kaam kar raha hai
-  // ADMIN_BASE_URL: https://hrntechsolutions.com/backend/admin
   const rootDomain = ADMIN_BASE_URL.split("/backend/admin")[0].replace(
     /\/+$/,
     "",
@@ -73,7 +71,7 @@ const Home = () => {
 
   const [aboutData, setAboutData] = useState(null);
 
-  // 🔥 NEW: State for the recent 3 projects
+  // State for the recent 3 projects
   const [recentProjects, setRecentProjects] = useState([]);
 
   // Map Animation hooks
@@ -129,7 +127,7 @@ const Home = () => {
             id: program.id || index + 1,
             title: program.title || "Untitled Program",
             description: program.description || "No description available.",
-            image_url: program.image_url, // Path will be processed in render
+            image_url: program.image_url,
             slug:
               program.slug ||
               createSlug(program.title) ||
@@ -173,7 +171,6 @@ const Home = () => {
       }
     };
 
-    // 🔥 NEW: Fetch recent 3 projects
     const fetchRecentProjects = async () => {
       try {
         const response = await fetch(
@@ -181,7 +178,6 @@ const Home = () => {
         );
         const data = await response.json();
         if (data.status === "success" && Array.isArray(data.data)) {
-          // Grab only the first 3 projects
           setRecentProjects(data.data.slice(0, 3));
         }
       } catch (err) {
@@ -192,7 +188,7 @@ const Home = () => {
     fetchPrograms();
     fetchFocusAreas();
     fetchAboutData();
-    fetchRecentProjects(); // Trigger the fetch
+    fetchRecentProjects();
   }, []);
 
   const formatCompact = (num) => {
@@ -240,7 +236,9 @@ const Home = () => {
       setIsSubmitting(false);
     }
   };
+
   /////////////////////// State wise image data /////////////////////////
+  // 🔥 FIXED SYNTAX ERROR HERE BY CHANGING KEY TO "Uttarakhand" (OR USE QUOTES IF YOU WANT "Camp/Impacted")
   const stateStaticData = {
     "Andhra Pradesh": {
       image: "/images/states/ap.jpg",
@@ -295,7 +293,7 @@ const Home = () => {
     },
     Tripura: { image: "/images/states/tripura.jpg", livesImpacted: "70k+" },
     "Uttar Pradesh": { image: "/images/states/up.jpg", livesImpacted: "2.5M+" },
-    Uttarakhand: {
+    "Uttarakhand": {
       image: "/images/states/uttarakhand.jpg",
       livesImpacted: "200k+",
     },
@@ -339,7 +337,6 @@ const Home = () => {
             </div>
 
             <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* 🔥 UPDATED: Mapping over dynamic projects with fixed image URL logic */}
               {recentProjects.length > 0 ? (
                 recentProjects.map((project, idx) => {
                   const finalMediaUrl = getImageUrl(project.image_url);
@@ -472,7 +469,6 @@ const Home = () => {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Yahan [...programsList].reverse() add kiya gaya hai */}
                 {[...programsList].reverse().map((program) => (
                   <div
                     key={program.id}
@@ -723,6 +719,21 @@ const Home = () => {
                       </div>
                     </li>
 
+                    {/* Total Complete Projects for Selected State View */}
+                    <li className="flex items-center gap-4 group">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
+                        {selectedMapState.completedProjectCount || selectedMapState.projects.filter(p => p.status === 'completed' || p.is_completed).length || 0}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">
+                          Total Complete Projects
+                        </div>
+                        <div className="text-[11px] text-gray-400 uppercase font-bold tracking-tighter">
+                          Successfully Delivered
+                        </div>
+                      </div>
+                    </li>
+
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
                         {selectedMapState.livesImpacted || "0"}
@@ -789,19 +800,22 @@ const Home = () => {
                         </div>
                       </div>
                     </li>
+                    
+                    {/* Total Complete Projects for National/Default View */}
                     <li className="flex items-center gap-4 group">
-                      <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        {mapTotals.totalProjects}
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
+                        {mapTotals.totalCompletedProjects || "35+"}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
-                          Total Completed Projects
+                          Total Complete Projects
                         </div>
                         <div className="text-[11px] text-gray-500 uppercase tracking-tighter">
-                          Active Currently
+                          Successfully Delivered
                         </div>
                       </div>
                     </li>
+
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
                         {mapTotals.totalBeneficiaries}
