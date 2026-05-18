@@ -790,6 +790,19 @@ const Home = () => {
                       </div>
                     </li>
                     <li className="flex items-center gap-4 group">
+                      <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
+                        {mapTotals.totalProjects}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-gray-800">
+                          Total Completed Projects
+                        </div>
+                        <div className="text-[11px] text-gray-500 uppercase tracking-tighter">
+                          Active Currently
+                        </div>
+                      </div>
+                    </li>
+                    <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
                         {mapTotals.totalBeneficiaries}
                       </div>
