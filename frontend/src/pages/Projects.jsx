@@ -71,35 +71,35 @@ const Projects = () => {
   const mapClipPath = useMotionTemplate`circle(${mapClipPercentage}% at 50% 50%)`;
 
   const stateStaticData = {
-    "Andhra Pradesh": { image: "/images/states/ap.jpg", livesImpacted: "800k+" },
-    "Arunachal Pradesh": { image: "/images/states/arunachal.jpg", livesImpacted: "50k+" },
-    Assam: { image: "/images/states/assam.jpg", livesImpacted: "200k+" },
-    Bihar: { image: "/about/news3.png", livesImpacted: "1M+" },
-    Chhattisgarh: { image: "/images/states/cg.jpg", livesImpacted: "300k+" },
-    Goa: { image: "/images/states/goa.jpg", livesImpacted: "20k+" },
-    Gujarat: { image: "/images/states/gujarat.jpg", livesImpacted: "600k+" },
-    Haryana: { image: "/images/states/haryana.jpg", livesImpacted: "400k+" },
-    "Himachal Pradesh": { image: "/images/states/hp.jpg", livesImpacted: "150k+" },
-    Jharkhand: { image: "/images/states/jharkhand.jpg", livesImpacted: "500k+" },
-    Karnataka: { image: "/images/states/karnataka.jpg", livesImpacted: "750k+" },
-    Kerala: { image: "/images/states/kerala.jpg", livesImpacted: "300k+" },
-    "Madhya Pradesh": { image: "/images/states/mp.jpg", livesImpacted: "1.2M+" },
-    Maharashtra: { image: "/images/states/maharashtra.jpg", livesImpacted: "2M+" },
-    Manipur: { image: "/images/states/manipur.jpg", livesImpacted: "40k+" },
-    Meghalaya: { image: "/images/states/meghalaya.jpg", livesImpacted: "60k+" },
-    Mizoram: { image: "/images/states/mizoram.jpg", livesImpacted: "30k+" },
-    Nagaland: { image: "/images/states/nagaland.jpg", livesImpacted: "45k+" },
-    Odisha: { image: "/images/states/odisha.jpg", livesImpacted: "900k+" },
-    Punjab: { image: "/images/states/punjab.jpg", livesImpacted: "400k+" },
-    Rajasthan: { image: "/images/states/rajasthan.jpg", livesImpacted: "1.1M+" },
-    Sikkim: { image: "/images/states/sikkim.jpg", livesImpacted: "25k+" },
-    "Tamil Nadu": { image: "/images/states/tn.jpg", livesImpacted: "850k+" },
-    Telangana: { image: "/images/states/telangana.jpg", livesImpacted: "600k+" },
-    Tripura: { image: "/images/states/tripura.jpg", livesImpacted: "70k+" },
-    "Uttar Pradesh": { image: "/images/states/up.jpg", livesImpacted: "2.5M+" },
-    Uttarakhand: { image: "/images/states/uttarakhand.jpg", livesImpacted: "200k+" },
-    "West Bengal": { image: "/images/states/wb.jpg", livesImpacted: "1.3M+" },
-    "Jammu and Kashmir": { image: "/images/states/jk.jpg", livesImpacted: "100k+" },
+    "Andhra Pradesh": { image: "map/AndhraPradesh.jpg", livesImpacted: "800k+" },
+    "Arunachal Pradesh": { image: "map/ArunachalPradesh.jpg", livesImpacted: "50k+" },
+    "Assam": { image: "map/Assam.jpg", livesImpacted: "200k+" },
+    "Bihar": { image: "map/Bihar.jpg", livesImpacted: "1M+" },
+    "Chhattisgarh": { image: "map/Chhattisgarh.jpg", livesImpacted: "300k+" },
+    "Goa": { image: "map/Goa.jpg", livesImpacted: "20k+" },
+    "Gujarat": { image: "map/Gujarat.jpg", livesImpacted: "600k+" },
+    "Haryana": { image: "map/Haryana.jpg", livesImpacted: "400k+" },
+    "Himachal Pradesh": { image: "map/Himachal Pradesh.jpg", livesImpacted: "150k+" },
+    "Jharkhand": { image: "map/Jharkhand.jpg", livesImpacted: "500k+" },
+    "Karnataka": { image: "map/Karnataka.jpg", livesImpacted: "750k+" },
+    "Kerala": { image: "map/Kerala.jpg", livesImpacted: "300k+" },
+    "Madhya Pradesh": { image: "map/Madhya Pradesh.jpg", livesImpacted: "1.2M+" },
+    "Maharashtra": { image: "map/Maharashtra.jpg", livesImpacted: "2M+" },
+    "Manipur": { image: "map/Manipur.jpg", livesImpacted: "40k+" },
+    "Meghalaya": { image: "map/Meghalaya.jpg", livesImpacted: "60k+" },
+    "Mizoram": { image: "map/Mizoram.jpg", livesImpacted: "30k+" },
+    "Nagaland": { image: "map/Nagaland.jpg", livesImpacted: "45k+" },
+    "Odisha": { image: "map/Odisha.jpg", livesImpacted: "900k+" },
+    "Punjab": { image: "map/Punjab.jpg", livesImpacted: "400k+" },
+    "Rajasthan": { image: "map/Rajasthan.jpg", livesImpacted: "1.1M+" },
+    "Sikkim": { image: "map/Sikkim.jpg", livesImpacted: "25k+" },
+    "Tamil Nadu": { image: "map/TamilNadu.jpg", livesImpacted: "850k+" },
+    "Telangana": { image: "map/Telangana.jpg", livesImpacted: "600k+" },
+    "Tripura": { image: "map/Tripura.jpg", livesImpacted: "70k+" },
+    "Uttar Pradesh": { image: "map/Uttar Pradesh.jpg", livesImpacted: "2.5M+" },
+    "Uttarakhand": { image: "map/Uttarakhand.jpg", livesImpacted: "200k+" },
+    "West Bengal": { image: "map/WestBengal.jpg", livesImpacted: "1.3M+" },
+    "Jammu and Kashmir": { image: "map/Jammu and Kashmir.png", livesImpacted: "100k+" },
   };
 
   useEffect(() => {
@@ -355,7 +355,7 @@ const Projects = () => {
                     <p className="text-[10px] text-primary font-bold uppercase tracking-widest mb-1">Currently Viewing</p>
                     <h4 className="text-2xl font-serif font-bold text-text-primary">📍 {selectedMapState.name}</h4>
                   </div>
-                  <div className="mb-8 rounded-xl overflow-hidden h-44 bg-gray-100 border border-gray-100 shadow-inner">
+                  <div className="mb-8 rounded-xl overflow-hidden h-54 bg-gray-100 border border-gray-100 shadow-inner">
                     <img src={stateStaticData[selectedMapState.name]?.image || "https://placehold.co/600x400?text=SDF+Impact"} alt={selectedMapState.name} className="w-full h-full object-cover" />
                   </div>
                   <ul className="space-y-6">
