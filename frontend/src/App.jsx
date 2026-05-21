@@ -21,8 +21,6 @@ import ProgramDetails from './pages/Programdetails';
 import ProjectDetails from './pages/Projectdetails';
 import PressCoverageDetails from './pages/PressCoverageDetails';
 import PartnersSection from './components/Partners';
-import PublicPartnersSection from './components/public_partners';
-import SocietyPartnersSection from './components/Society_partners';
 
 
 
@@ -47,8 +45,6 @@ function App() {
           <Route path="volunteerform" element={<VolunteerForm/>} />
           <Route path="projects" element={<Projects />} />
           <Route path="partners" element={<PartnersSection />} />
-          <Route path="public_partners" element={<PublicPartnersSection />} />
-          <Route path="society_partners" element={<SocietyPartnersSection />} />
           <Route path="projectdetails/:slug" element={<ProjectDetails />} />
           <Route path="press-coverage/:slug" element={<PressCoverageDetails />} />
           <Route path="publications" element={<Publications />} />
