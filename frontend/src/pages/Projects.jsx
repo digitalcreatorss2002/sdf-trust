@@ -28,7 +28,7 @@ const Projects = () => {
       totalBeneficiaries: "2M+"
   });
 
-  // Category state under "All Projects" - defaults to null to show all projects initially
+  // Category state under dynamic dynamic listings - defaults to null to show all projects initially
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   // 🔥 UPDATED IMAGE URL HELPER: Aligned with Bluehost backend/admin/uploads structure
@@ -105,10 +105,16 @@ const Projects = () => {
   useEffect(() => {
     if (location.hash) {
       const tab = decodeURIComponent(location.hash.replace("#", ""));
-      if (tab === "ongoing" || tab === "impact") {
+      if (tab === "all" || tab === "ongoing") {
         setActiveTab("all");
+      } else if (tab === "completed") {
+        setActiveTab("completed");
+      } else if (tab === "planned") {
+        setActiveTab("planned");
+      } else if (tab === "listings") {
+        setActiveTab("listings");
       } else {
-        setActiveTab(tab);
+        setActiveTab("all");
       }
     } else {
       setActiveTab("all");
@@ -123,9 +129,6 @@ const Projects = () => {
         
         if (data.status === 'success') {
           setProjects(data.data);
-          if (!location.hash) {
-            setActiveTab("all");
-          }
         } else {
           setError(data.message || 'Failed to fetch projects');
         }
@@ -178,11 +181,25 @@ const Projects = () => {
     return label.replace(/[_-]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
-  // Updated Filter Logic based on sub-menu selection
-  let displayProjects = projects;
+  // Calculate dynamic completed projects counts directly from the array for global snapshot view
+  const globalCompletedCount = projects.filter(p => p.status?.toLowerCase() === 'completed').length;
+
+  // Exact conditional schema validation logic aligned with dynamic tabs
+  let displayProjects = [];
   if (activeTab === "all") {
+      displayProjects = projects.filter((p) => p.status?.toLowerCase() === 'active' || p.status?.toLowerCase() === 'ongoing');
       if (selectedCategory) {
-          displayProjects = projects.filter((p) => p.category?.trim() === selectedCategory);
+          displayProjects = displayProjects.filter((p) => p.category?.trim() === selectedCategory);
+      }
+  } else if (activeTab === "completed") {
+      displayProjects = projects.filter((p) => p.status?.toLowerCase() === 'completed');
+      if (selectedCategory) {
+          displayProjects = displayProjects.filter((p) => p.category?.trim() === selectedCategory);
+      }
+  } else if (activeTab === "planned") {
+      displayProjects = projects.filter((p) => p.status?.toLowerCase() === 'planned');
+      if (selectedCategory) {
+          displayProjects = displayProjects.filter((p) => p.category?.trim() === selectedCategory);
       }
   } else if (activeTab === "listings") {
       displayProjects = projects.filter(p => {
@@ -202,9 +219,15 @@ const Projects = () => {
     <div className="bg-bg-color min-h-screen pb-20">
       <section id="ongoing" className="bg-accent text-white py-20 relative overflow-hidden scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Ongoing Projects</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">
+            {activeTab === "completed" ? "Completed Projects" : activeTab === "planned" ? "Planned Projects" : "Ongoing Projects"}
+          </h1>
           <p className="text-xl max-w-2xl mx-auto text-blue-50">
-            Discover our active interventions and on-ground activities across various geographies.
+            {activeTab === "completed" 
+              ? "Take a look at our successfully delivered programs and sustained institutional milestones." 
+              : activeTab === "planned" 
+              ? "Explore upcoming strategies, planned programs, and future field operations." 
+              : "Discover our active interventions and on-ground activities across various geographies."}
           </p>
         </div>
       </section>
@@ -215,14 +238,16 @@ const Projects = () => {
             <span>❮</span>
           </button>
           
-          {/* Main Top Navigation Header */}
+          {/* Main Top Navigation Header with Completed and Planned Tabs Reinstated */}
           <div ref={scrollRef} className="flex items-center justify-center space-x-8 overflow-x-auto no-scrollbar scroll-smooth px-12">
-            <button onClick={() => { setActiveTab("all"); setSelectedCategory(null); window.history.replaceState(null, "", `#all`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "all" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>All Projects 🏢</button>
+            <button onClick={() => { setActiveTab("all"); setSelectedCategory(null); window.history.replaceState(null, "", `#all`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "all" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>Ongoing Projects 🏢</button>
+            <button onClick={() => { setActiveTab("completed"); setSelectedCategory(null); window.history.replaceState(null, "", `#completed`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "completed" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>Completed Projects ✅</button>
+            <button onClick={() => { setActiveTab("planned"); setSelectedCategory(null); window.history.replaceState(null, "", `#planned`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "planned" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>Planned Projects 📋</button>
             <button onClick={() => { setActiveTab("listings"); window.history.replaceState(null, "", `#listings`); }} className={`py-4 border-b-2 font-bold whitespace-nowrap transition-colors shrink-0 ${activeTab === "listings" ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-primary"}`}>State-wise Listings 📍</button>
           </div>
 
-          {/* Sub-menu Row: Shows ONLY core dynamic categories (No "All Projects" button here) */}
-          {activeTab === "all" && uniqueCategories.length > 0 && (
+          {/* Sub-menu Row: Core Dynamic Sub-Categories shown across status variations */}
+          {(activeTab === "all" || activeTab === "completed" || activeTab === "planned") && uniqueCategories.length > 0 && (
             <div className="flex flex-wrap items-center justify-center gap-2 mt-2 pb-4 bg-white border-t pt-3 border-gray-50 animate-in fade-in duration-300">
               {uniqueCategories.map(cat => (
                 <button key={cat} onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === cat ? "bg-[#6a752b] text-white shadow" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}`}>{formatTabLabel(cat)}</button>
@@ -250,7 +275,7 @@ const Projects = () => {
           {isLoading ? (
             <div className="col-span-2 py-12 text-center text-gray-500 flex flex-col items-center">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              Loading active projects...
+              Loading projects...
             </div>
           ) : error ? (
             <div className="col-span-2 py-8 px-6 bg-red-50 text-red-600 rounded-xl border border-red-100 text-center">⚠️ {error}</div>
@@ -283,7 +308,12 @@ const Projects = () => {
                     )}
                   </div>
                   <div className="flex flex-col flex-1">
-                    <div className="text-[10px] font-bold text-accent uppercase tracking-widest mb-2">{project.category}</div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-[10px] font-bold text-accent uppercase tracking-widest">{project.category}</div>
+                      <span className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded ${project.status?.toLowerCase() === 'completed' ? 'bg-green-100 text-green-700' : project.status?.toLowerCase() === 'planned' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-700'}`}>
+                        {project.status}
+                      </span>
+                    </div>
                     <h3 className="text-2xl font-serif font-bold text-text-primary mb-2 leading-tight">{project.title}</h3>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{project.description}</p>
                     <div className="flex items-center gap-2 text-sm text-gray-500 mb-4 mt-auto">
@@ -351,17 +381,16 @@ const Projects = () => {
                       </div>
                     </li>
                     <li className="flex items-center gap-4 group">
-                      <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">{selectedMapState.projects.length}</div>
+                      <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">{selectedMapState.projects?.length || 0}</div>
                       <div>
                         <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">Major Projects</div>
                         <div className="text-[11px] text-gray-400 uppercase font-bold tracking-tighter">Active Currently</div>
                       </div>
                     </li>
                     
-                    {/* 🔥 Added: Total Complete Projects for Selected State View */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
-                        {selectedMapState.completedProjectCount || selectedMapState.projects.filter(p => p.status === 'completed' || p.is_completed).length || 0}
+                        {selectedMapState.projects?.filter(p => p.status?.toLowerCase() === 'completed' || p.is_completed).length || 0}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">Total Complete Projects</div>
@@ -398,9 +427,10 @@ const Projects = () => {
                       <div><div className="text-sm font-bold text-gray-800">Major Projects</div><div className="text-[11px] text-gray-500 uppercase tracking-tighter">Active Currently</div></div>
                     </li>
 
-                    {/* 🔥 Added: Total Complete Projects for National/Default View */}
                     <li className="flex items-center gap-4 group">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">{mapTotals.totalCompletedProjects || "35+"}</div>
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
+                        {globalCompletedCount}
+                      </div>
                       <div><div className="text-sm font-bold text-gray-800">Total Complete Projects</div><div className="text-[11px] text-gray-500 uppercase tracking-tighter">Successfully Delivered</div></div>
                     </li>
 

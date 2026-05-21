@@ -391,7 +391,7 @@ const About = () => {
 
                 {/* 2. Public Section */}
                 <Link
-                  to="/partners"
+                  to="/public_partners"
                   className="p-8 bg-gray-50 rounded-2xl hover:shadow-lg transition-all group cursor-pointer border border-transparent hover:border-primary/20"
                 >
                   <div className="font-bold text-primary text-xl mb-2 group-hover:scale-105 transition-transform">
@@ -402,7 +402,7 @@ const About = () => {
 
                 {/* 3. Civil Society Section */}
                 <Link
-                  to="/partners"
+                  to="/society_partners"
                   className="p-8 bg-gray-50 rounded-2xl hover:shadow-lg transition-all group cursor-pointer border border-transparent hover:border-primary/20"
                 >
                   <div className="font-bold text-primary text-xl mb-2 group-hover:scale-105 transition-transform">

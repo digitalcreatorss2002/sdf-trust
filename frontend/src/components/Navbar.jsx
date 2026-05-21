@@ -78,11 +78,11 @@ const Navbar = () => {
       hasDropdown: true,
       dropdownItems: [
         { label: "Ongoing Projects", path: "/projects#ongoing", icon: "🏢" },
-        {
-          label: "State-wise Listings",
-          path: "/projects#listings",
-          icon: "🗺️",
-        },
+        // {
+        //   label: "State-wise Listings",
+        //   path: "/projects#listings",
+        //   icon: "🗺️",
+        // },
         { label: "Impact Snapshot", path: "/projects#impact", icon: "📊" },
       ],
     },

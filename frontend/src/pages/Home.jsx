@@ -71,7 +71,8 @@ const Home = () => {
 
   const [aboutData, setAboutData] = useState(null);
 
-  // State for the recent 3 projects
+  // State for raw list of all backend projects to support live calculations
+  const [allProjects, setAllProjects] = useState([]);
   const [recentProjects, setRecentProjects] = useState([]);
 
   // Map Animation hooks
@@ -178,6 +179,7 @@ const Home = () => {
         );
         const data = await response.json();
         if (data.status === "success" && Array.isArray(data.data)) {
+          setAllProjects(data.data);
           setRecentProjects(data.data.slice(0, 3));
         }
       } catch (err) {
@@ -237,71 +239,69 @@ const Home = () => {
     }
   };
 
-  /////////////////////// State wise image data /////////////////////////
-  // 🔥 FIXED SYNTAX ERROR HERE BY CHANGING KEY TO "Uttarakhand" (OR USE QUOTES IF YOU WANT "Camp/Impacted")
+  // National/Global Counters derived directly from dynamic live database collection array
+  const globalCompletedCount = allProjects.filter(p => p.status?.toLowerCase() === 'completed').length;
+  
+  // Dynamic summation parser logic loop computing dynamic numeric beneficiaries metrics values natively
+  const globalLivesImpactedSum = allProjects.reduce((acc, curr) => {
+    if (!curr.beneficiaries) return acc;
+    const parsed = parseInt(curr.beneficiaries.toString().replace(/[^0-9]/g, ""), 10);
+    return isNaN(parsed) ? acc : acc + parsed;
+  }, 0);
+
   const stateStaticData = {
-    "Andhra Pradesh": {
-      image: "/images/states/ap.jpg",
-      livesImpacted: "800k+",
-    },
-    "Arunachal Pradesh": {
-      image: "/images/states/arunachal.jpg",
-      livesImpacted: "50k+",
-    },
+    "Andhra Pradesh": { image: "/images/states/ap.jpg", livesImpacted: "800k+" },
+    "Arunachal Pradesh": { image: "/images/states/arunachal.jpg", livesImpacted: "50k+" },
     Assam: { image: "/images/states/assam.jpg", livesImpacted: "200k+" },
     Bihar: { image: "public/about/news3.png", livesImpacted: "1M+" },
     Chhattisgarh: { image: "/images/states/cg.jpg", livesImpacted: "300k+" },
     Goa: { image: "/images/states/goa.jpg", livesImpacted: "20k+" },
     Gujarat: { image: "/images/states/gujarat.jpg", livesImpacted: "600k+" },
     Haryana: { image: "/images/states/haryana.jpg", livesImpacted: "400k+" },
-    "Himachal Pradesh": {
-      image: "/images/states/hp.jpg",
-      livesImpacted: "150k+",
-    },
-    Jharkhand: {
-      image: "/images/states/jharkhand.jpg",
-      livesImpacted: "500k+",
-    },
-    Karnataka: {
-      image: "/images/states/karnataka.jpg",
-      livesImpacted: "750k+",
-    },
+    "Himachal Pradesh": { image: "/images/states/hp.jpg", livesImpacted: "150k+" },
+    Jharkhand: { image: "/images/states/jharkhand.jpg", livesImpacted: "500k+" },
+    Karnataka: { image: "/images/states/karnataka.jpg", livesImpacted: "750k+" },
     Kerala: { image: "/images/states/kerala.jpg", livesImpacted: "300k+" },
-    "Madhya Pradesh": {
-      image: "/images/states/mp.jpg",
-      livesImpacted: "1.2M+",
-    },
-    Maharashtra: {
-      image: "/images/states/maharashtra.jpg",
-      livesImpacted: "2M+",
-    },
+    "Madhya Pradesh": { image: "/images/states/mp.jpg", livesImpacted: "1.2M+" },
+    Maharashtra: { image: "/images/states/maharashtra.jpg", livesImpacted: "2M+" },
     Manipur: { image: "/images/states/manipur.jpg", livesImpacted: "40k+" },
     Meghalaya: { image: "/images/states/meghalaya.jpg", livesImpacted: "60k+" },
     Mizoram: { image: "/images/states/mizoram.jpg", livesImpacted: "30k+" },
     Nagaland: { image: "/images/states/nagaland.jpg", livesImpacted: "45k+" },
     Odisha: { image: "/images/states/odisha.jpg", livesImpacted: "900k+" },
     Punjab: { image: "/images/states/punjab.jpg", livesImpacted: "400k+" },
-    Rajasthan: {
-      image: "/images/states/rajasthan.jpg",
-      livesImpacted: "1.1M+",
-    },
+    Rajasthan: { image: "/images/states/rajasthan.jpg", livesImpacted: "1.1M+" },
     Sikkim: { image: "/images/states/sikkim.jpg", livesImpacted: "25k+" },
     "Tamil Nadu": { image: "/images/states/tn.jpg", livesImpacted: "850k+" },
-    Telangana: {
-      image: "/images/states/telangana.jpg",
-      livesImpacted: "600k+",
-    },
+    Telangana: { image: "/images/states/telangana.jpg", livesImpacted: "600k+" },
     Tripura: { image: "/images/states/tripura.jpg", livesImpacted: "70k+" },
     "Uttar Pradesh": { image: "/images/states/up.jpg", livesImpacted: "2.5M+" },
-    "Uttarakhand": {
-      image: "/images/states/uttarakhand.jpg",
-      livesImpacted: "200k+",
-    },
+    Uttarakhand: { image: "/images/states/uttarakhand.jpg", livesImpacted: "200k+" },
     "West Bengal": { image: "/images/states/wb.jpg", livesImpacted: "1.3M+" },
-    "Jammu and Kashmir": {
-      image: "/images/states/jk.jpg",
-      livesImpacted: "100k+",
-    },
+    "Jammu and Kashmir": { image: "/images/states/jk.jpg", livesImpacted: "100k+" },
+  };
+
+  // Helper routine computing live state wise filtered beneficiaries values directly
+  const getStateLivesImpactedCount = (stateName) => {
+    const stateProjects = allProjects.filter(p => {
+      let states = [];
+      try {
+         const locs = JSON.parse(p.state_locations || "[]");
+         states = locs.map(l => l.state?.trim().toLowerCase());
+      } catch(e) {}
+      if (states.length === 0 && p.location) {
+         states = p.location.split(',').map(s => s.trim().toLowerCase());
+      }
+      return states.includes(stateName.toLowerCase());
+    });
+
+    const sum = stateProjects.reduce((acc, curr) => {
+      if (!curr.beneficiaries) return acc;
+      const parsed = parseInt(curr.beneficiaries.toString().replace(/[^0-9]/g, ""), 10);
+      return isNaN(parsed) ? acc : acc + parsed;
+    }, 0);
+
+    return sum > 0 ? formatCompact(sum) : stateStaticData[stateName]?.livesImpacted || "0";
   };
 
   return (
@@ -591,6 +591,7 @@ const Home = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             <div
+              key="map-container"
               ref={mapRef}
               className="lg:col-span-2 relative h-150 md:h-200 flex items-center justify-center bg-transparent"
             >
@@ -615,9 +616,7 @@ const Home = () => {
                       totalStates: totals.totalStates,
                       totalDistricts: totals.totalDistricts,
                       totalProjects: totals.totalProjects,
-                      totalBeneficiaries: formatCompact(
-                        totals.totalBeneficiaries,
-                      ),
+                      totalBeneficiaries: totals.totalBeneficiaries ? formatCompact(totals.totalBeneficiaries) : mapTotals.totalBeneficiaries,
                     })
                   }
                 />
@@ -707,7 +706,7 @@ const Home = () => {
 
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
-                        {selectedMapState.projects.length}
+                        {selectedMapState.projects?.length || 0}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">
@@ -719,10 +718,10 @@ const Home = () => {
                       </div>
                     </li>
 
-                    {/* Total Complete Projects for Selected State View */}
+                    {/* 🔥 Dynamic State wise Completed Project Count calculation */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
-                        {selectedMapState.completedProjectCount || selectedMapState.projects.filter(p => p.status === 'completed' || p.is_completed).length || 0}
+                        {selectedMapState.projects?.filter(p => p.status?.toLowerCase() === 'completed' || p.is_completed).length || 0}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">
@@ -734,9 +733,10 @@ const Home = () => {
                       </div>
                     </li>
 
+                    {/* 🔥 Dynamic State wise Beneficiaries Mapping */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
-                        {selectedMapState.livesImpacted || "0"}
+                        {getStateLivesImpactedCount(selectedMapState.name)}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">
@@ -801,10 +801,10 @@ const Home = () => {
                       </div>
                     </li>
                     
-                    {/* Total Complete Projects for National/Default View */}
+                    {/* 🔥 Dynamic Live National Counter for Completed Projects */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        {mapTotals.totalCompletedProjects || "35+"}
+                        {globalCompletedCount > 0 ? globalCompletedCount : "45+"}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -816,9 +816,10 @@ const Home = () => {
                       </div>
                     </li>
 
+                    {/* 🔥 Dynamic Live National Counter for Lives Impacted Summation */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        {mapTotals.totalBeneficiaries}
+                        {globalLivesImpactedSum > 0 ? formatCompact(globalLivesImpactedSum) : mapTotals.totalBeneficiaries}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
