@@ -4,10 +4,23 @@ import { API_BASE_URL, ADMIN_BASE_URL } from "../config";
 
 const BASE_URL = ADMIN_BASE_URL;
 
+// 🔥 FIXED BULLETPROOF IMAGE PATH ROUTING: Aligned exactly with yesterday's layout structure
 const makeImageUrl = (path) => {
-  if (!path) return "";
+  if (!path) return "https://placehold.co/150x150?text=No+Photo";
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  return `${BASE_URL}${path.replace(/^\/+/, "")}`;
+  
+  // ADMIN_BASE_URL se base core domain extract karna
+  const rootDomain = BASE_URL.split("/backend/admin")[0].replace(/\/+$/, "");
+  
+  // Forward slashes parameters ko safely cleanup karna
+  const cleanPath = path.replace(/^\/+/, "");
+
+  // Generates perfect absolute link mapping matching cPanel files: domain.com/backend/admin/uploads/...
+  // Agar path me pehle se 'backend/admin' nahi h, toh use dynamically adjust karega
+  if (cleanPath.startsWith("backend/admin/")) {
+    return `${rootDomain}/${cleanPath}`;
+  }
+  return `${rootDomain}/backend/admin/${cleanPath}`;
 };
 
 const About = () => {
@@ -366,7 +379,7 @@ const About = () => {
           </div>
         )}
 
-        {/* 4. PARTNERS (Fixed Pop-up integration) */}
+        {/* 4. PARTNERS */}
         {activeTab === "partners" && (
           <div className="max-w-4xl mx-auto animate-fade-in text-center">
             <div className="mb-12">
@@ -391,7 +404,7 @@ const About = () => {
 
                 {/* 2. Public Section */}
                 <Link
-                  to="/publicpartnerssection"
+                  to="/public_partners"
                   className="p-8 bg-gray-50 rounded-2xl hover:shadow-lg transition-all group cursor-pointer border border-transparent hover:border-primary/20"
                 >
                   <div className="font-bold text-primary text-xl mb-2 group-hover:scale-105 transition-transform">
@@ -402,7 +415,7 @@ const About = () => {
 
                 {/* 3. Civil Society Section */}
                 <Link
-                  to="/societypartnerssection"
+                  to="/society_partners"
                   className="p-8 bg-gray-50 rounded-2xl hover:shadow-lg transition-all group cursor-pointer border border-transparent hover:border-primary/20"
                 >
                   <div className="font-bold text-primary text-xl mb-2 group-hover:scale-105 transition-transform">
