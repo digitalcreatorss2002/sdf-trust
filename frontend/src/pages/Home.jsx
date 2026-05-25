@@ -13,6 +13,7 @@ import Testimonials from "./Testimonials";
 import MapSection from "../components/MapSection";
 import PartnersSection from "../components/Partners";
 import ProjectSlider from "../components/ProjectSlider";
+import OurProgramsSection from "../components/OurProgramsSection";
 // import ProjectMap from "../components/ProjectMap";
 
 const PROGRAMS_API_URL = `${API_BASE_URL}/programs.php?t=` + Date.now();
@@ -495,78 +496,7 @@ const Home = () => {
 
       <ProjectSlider />
 
-      <section className="py-10 bg-bg-color">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h2 className="text-3xl font-serif text-text-primary mb-12">
-      Our Programs
-    </h2>
-
-    {programsLoading ? (
-      <p className="text-primary font-semibold">Loading programs...</p>
-    ) : programsError ? (
-      <p className="text-red-500 font-semibold">{programsError}</p>
-    ) : programsList.length === 0 ? (
-      <p className="text-gray-500">No programs found.</p>
-    ) : (
-      <>
-        {/* Grid Box */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* 🔥 यहाँ [...programsList].reverse() एकदम परफेक्टली सेट है, 
-              ताकि जो प्रोग्राम सबसे लास्ट में ऐड हुआ है, वो यहाँ सबसे पहले दिखे। */}
-          {[...programsList].reverse().map((program) => (
-            <div
-              key={program.id}
-              className="bg-white rounded-xl border border-gray-100 text-left hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full"
-            >
-              {/* Image Container */}
-              <div className="h-48 overflow-hidden relative">
-                <img
-                  src={getImageUrl(program.image_url)}
-                  alt={program.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      "https://via.placeholder.com/800x500?text=Image+Not+Found";
-                  }}
-                />
-              </div>
-
-              {/* Content Area */}
-              <div className="p-6 grow flex flex-col">
-                <h3 className="text-xl font-serif font-bold text-text-primary mb-3 leading-tight">
-                  {program.title}
-                </h3>
-
-                <p className="text-gray-500 text-sm mb-6 grow">
-                  {program.description.length > 100
-                    ? `${program.description.slice(0, 100)}...`
-                    : program.description}
-                </p>
-
-                <Link
-                  to={`/programdetails/${program.slug}`}
-                  className="bg-primary hover:bg-[#5a6425] text-white px-6 py-2 rounded-full font-medium text-sm transition-colors self-start mt-auto inline-block"
-                >
-                  Learn More
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom Navigation Button */}
-        <div className="mt-10">
-          <Link
-            to="/programs"
-            className="inline-block border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-full font-semibold transition-colors"
-          >
-            View All Programs
-          </Link>
-        </div>
-      </>
-    )}
-  </div>
-</section>
+      <OurProgramsSection/>
 
       <Testimonials />
 
