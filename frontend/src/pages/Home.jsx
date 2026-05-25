@@ -240,68 +240,93 @@ const Home = () => {
   };
 
   // National/Global Counters derived directly from dynamic live database collection array
-  const globalCompletedCount = allProjects.filter(p => p.status?.toLowerCase() === 'completed').length;
-  
+  const globalCompletedCount = allProjects.filter(
+    (p) => p.status?.toLowerCase() === "completed",
+  ).length;
+
   // Dynamic summation parser logic loop computing dynamic numeric beneficiaries metrics values natively
   const globalLivesImpactedSum = allProjects.reduce((acc, curr) => {
     if (!curr.beneficiaries) return acc;
-    const parsed = parseInt(curr.beneficiaries.toString().replace(/[^0-9]/g, ""), 10);
+    const parsed = parseInt(
+      curr.beneficiaries.toString().replace(/[^0-9]/g, ""),
+      10,
+    );
     return isNaN(parsed) ? acc : acc + parsed;
   }, 0);
 
   const stateStaticData = {
-    "Andhra Pradesh": { image: "map/AndhraPradesh.jpg", livesImpacted: "800k+" },
-    "Arunachal Pradesh": { image: "map/ArunachalPradesh.jpg", livesImpacted: "50k+" },
-    "Assam": { image: "map/Assam.jpg", livesImpacted: "200k+" },
-    "Bihar": { image: "map/Bihar.jpg", livesImpacted: "1M+" },
-    "Chhattisgarh": { image: "map/Chhattisgarh.jpg", livesImpacted: "300k+" },
-    "Goa": { image: "map/Goa.jpg", livesImpacted: "20k+" },
-    "Gujarat": { image: "map/Gujarat.jpg", livesImpacted: "600k+" },
-    "Haryana": { image: "map/Haryana.jpg", livesImpacted: "400k+" },
-    "Himachal Pradesh": { image: "map/Himachal Pradesh.jpg", livesImpacted: "150k+" },
-    "Jharkhand": { image: "map/Jharkhand.jpg", livesImpacted: "500k+" },
-    "Karnataka": { image: "map/Karnataka.jpg", livesImpacted: "750k+" },
-    "Kerala": { image: "map/Kerala.jpg", livesImpacted: "300k+" },
-    "Madhya Pradesh": { image: "map/Madhya Pradesh.jpg", livesImpacted: "1.2M+" },
-    "Maharashtra": { image: "map/Maharashtra.jpg", livesImpacted: "2M+" },
-    "Manipur": { image: "map/Manipur.jpg", livesImpacted: "40k+" },
-    "Meghalaya": { image: "map/Meghalaya.jpg", livesImpacted: "60k+" },
-    "Mizoram": { image: "map/Mizoram.jpg", livesImpacted: "30k+" },
-    "Nagaland": { image: "map/Nagaland.jpg", livesImpacted: "45k+" },
-    "Odisha": { image: "map/Odisha.jpg", livesImpacted: "900k+" },
-    "Punjab": { image: "map/Punjab.jpg", livesImpacted: "400k+" },
-    "Rajasthan": { image: "map/Rajasthan.jpg", livesImpacted: "1.1M+" },
-    "Sikkim": { image: "map/Sikkim.jpg", livesImpacted: "25k+" },
+    "Andhra Pradesh": {
+      image: "map/AndhraPradesh.jpg",
+      livesImpacted: "800k+",
+    },
+    "Arunachal Pradesh": {
+      image: "map/ArunachalPradesh.jpg",
+      livesImpacted: "50k+",
+    },
+    Assam: { image: "map/Assam.jpg", livesImpacted: "200k+" },
+    Bihar: { image: "map/Bihar.jpg", livesImpacted: "1M+" },
+    Chhattisgarh: { image: "map/Chhattisgarh.jpg", livesImpacted: "300k+" },
+    Goa: { image: "map/Goa.jpg", livesImpacted: "20k+" },
+    Gujarat: { image: "map/Gujarat.jpg", livesImpacted: "600k+" },
+    Haryana: { image: "map/Haryana.jpg", livesImpacted: "400k+" },
+    "Himachal Pradesh": {
+      image: "map/Himachal Pradesh.jpg",
+      livesImpacted: "150k+",
+    },
+    Jharkhand: { image: "map/Jharkhand.jpg", livesImpacted: "500k+" },
+    Karnataka: { image: "map/Karnataka.jpg", livesImpacted: "750k+" },
+    Kerala: { image: "map/Kerala.jpg", livesImpacted: "300k+" },
+    "Madhya Pradesh": {
+      image: "map/Madhya Pradesh.jpg",
+      livesImpacted: "1.2M+",
+    },
+    Maharashtra: { image: "map/Maharashtra.jpg", livesImpacted: "2M+" },
+    Manipur: { image: "map/Manipur.jpg", livesImpacted: "40k+" },
+    Meghalaya: { image: "map/Meghalaya.jpg", livesImpacted: "60k+" },
+    Mizoram: { image: "map/Mizoram.jpg", livesImpacted: "30k+" },
+    Nagaland: { image: "map/Nagaland.jpg", livesImpacted: "45k+" },
+    Odisha: { image: "map/Odisha.jpg", livesImpacted: "900k+" },
+    Punjab: { image: "map/Punjab.jpg", livesImpacted: "400k+" },
+    Rajasthan: { image: "map/Rajasthan.jpg", livesImpacted: "1.1M+" },
+    Sikkim: { image: "map/Sikkim.jpg", livesImpacted: "25k+" },
     "Tamil Nadu": { image: "map/TamilNadu.jpg", livesImpacted: "850k+" },
-    "Telangana": { image: "map/Telangana.jpg", livesImpacted: "600k+" },
-    "Tripura": { image: "map/Tripura.jpg", livesImpacted: "70k+" },
+    Telangana: { image: "map/Telangana.jpg", livesImpacted: "600k+" },
+    Tripura: { image: "map/Tripura.jpg", livesImpacted: "70k+" },
     "Uttar Pradesh": { image: "map/Uttar Pradesh.jpg", livesImpacted: "2.5M+" },
-    "Uttarakhand": { image: "map/Uttarakhand.jpg", livesImpacted: "200k+" },
+    Uttarakhand: { image: "map/Uttarakhand.jpg", livesImpacted: "200k+" },
     "West Bengal": { image: "map/WestBengal.jpg", livesImpacted: "1.3M+" },
-    "Jammu and Kashmir": { image: "map/Jammu and Kashmir.png", livesImpacted: "100k+" },
+    "Jammu and Kashmir": {
+      image: "map/Jammu and Kashmir.png",
+      livesImpacted: "100k+",
+    },
   };
 
   // Helper routine computing live state wise filtered beneficiaries values directly
   const getStateLivesImpactedCount = (stateName) => {
-    const stateProjects = allProjects.filter(p => {
+    const stateProjects = allProjects.filter((p) => {
       let states = [];
       try {
-         const locs = JSON.parse(p.state_locations || "[]");
-         states = locs.map(l => l.state?.trim().toLowerCase());
-      } catch(e) {}
+        const locs = JSON.parse(p.state_locations || "[]");
+        states = locs.map((l) => l.state?.trim().toLowerCase());
+      } catch (e) {}
       if (states.length === 0 && p.location) {
-         states = p.location.split(',').map(s => s.trim().toLowerCase());
+        states = p.location.split(",").map((s) => s.trim().toLowerCase());
       }
       return states.includes(stateName.toLowerCase());
     });
 
     const sum = stateProjects.reduce((acc, curr) => {
       if (!curr.beneficiaries) return acc;
-      const parsed = parseInt(curr.beneficiaries.toString().replace(/[^0-9]/g, ""), 10);
+      const parsed = parseInt(
+        curr.beneficiaries.toString().replace(/[^0-9]/g, ""),
+        10,
+      );
       return isNaN(parsed) ? acc : acc + parsed;
     }, 0);
 
-    return sum > 0 ? formatCompact(sum) : stateStaticData[stateName]?.livesImpacted || "0";
+    return sum > 0
+      ? formatCompact(sum)
+      : stateStaticData[stateName]?.livesImpacted || "0";
   };
 
   return (
@@ -311,6 +336,7 @@ const Home = () => {
       <section className="py-10 relative bg-bg-color">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-12 items-center">
+            {/* Left Block: Info Content */}
             <div className="lg:w-1/3">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-2xl shadow-sm animate-float">
@@ -336,61 +362,76 @@ const Home = () => {
               </Link>
             </div>
 
+            {/* Right Block: Complete Projects Grid Only */}
             <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {recentProjects.length > 0 ? (
-                recentProjects.map((project, idx) => {
-                  const finalMediaUrl = getImageUrl(project.image_url);
+              {(() => {
+                // फ़िल्टर: सिर्फ 'completed' स्टेटस वाले प्रोजेक्ट्स को ही एरे में रखें
+                const completedProjects = recentProjects.filter(
+                  (project) => project && project.status === "completed",
+                );
+
+                if (completedProjects.length > 0) {
+                  return completedProjects.map((project, idx) => {
+                    const finalMediaUrl = getImageUrl(project.image_url);
+                    return (
+                      <div
+                        key={project.id || idx}
+                        className="bg-white rounded-2xl shadow-sm text-center border border-gray-100 pb-6 flex flex-col h-full hover:shadow-md transition-shadow"
+                      >
+                        {/* Media Wrapper */}
+                        <div className="p-4 h-40">
+                          {isVideoFile(project.image_url) ? (
+                            <video
+                              src={finalMediaUrl}
+                              className="w-full h-full object-cover rounded-xl shadow-sm"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                            />
+                          ) : (
+                            <img
+                              src={finalMediaUrl}
+                              alt={project.title}
+                              className="w-full h-full object-cover rounded-xl shadow-sm"
+                              onError={(e) => {
+                                e.currentTarget.src =
+                                  "https://via.placeholder.com/500x300?text=Image+Not+Found";
+                              }}
+                            />
+                          )}
+                        </div>
+
+                        {/* Text Content Area */}
+                        <div className="p-5 grow flex flex-col">
+                          <h3 className="text-xl font-serif text-text-primary mb-3 line-clamp-2">
+                            {project.title}
+                          </h3>
+                          <p className="text-gray-500 text-sm mb-6 grow line-clamp-3">
+                            {project.description}
+                          </p>
+
+                          <Link
+                            to={`/projectdetails/${project.slug}`}
+                            className="text-primary font-bold text-sm hover:underline mt-auto"
+                          >
+                            View Project →
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  });
+                } else {
+                  // अगर कोई भी प्रोजेक्ट कम्प्लीटेड नहीं है या डेटा लोड हो रहा है
                   return (
-                    <div
-                      key={project.id || idx}
-                      className="bg-white rounded-2xl shadow-sm text-center border border-gray-100 pb-6 flex flex-col h-full hover:shadow-md transition-shadow"
-                    >
-                      <div className="p-4 h-40">
-                        {isVideoFile(project.image_url) ? (
-                          <video
-                            src={finalMediaUrl}
-                            className="w-full h-full object-cover rounded-xl shadow-sm"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                          />
-                        ) : (
-                          <img
-                            src={finalMediaUrl}
-                            alt={project.title}
-                            className="w-full h-full object-cover rounded-xl shadow-sm"
-                            onError={(e) => {
-                              e.currentTarget.src =
-                                "https://via.placeholder.com/500x300?text=Image+Not+Found";
-                            }}
-                          />
-                        )}
-                      </div>
-
-                      <div className="p-5 grow flex flex-col">
-                        <h3 className="text-xl font-serif text-text-primary mb-3 line-clamp-2">
-                          {project.title}
-                        </h3>
-                        <p className="text-gray-500 text-sm mb-6 grow line-clamp-3">
-                          {project.description}
-                        </p>
-
-                        <Link
-                          to={`/projectdetails/${project.slug}`}
-                          className="text-primary font-bold text-sm hover:underline mt-auto"
-                        >
-                          View Project →
-                        </Link>
-                      </div>
+                    <div className="col-span-3 text-center text-gray-500 py-10 bg-white/50 rounded-2xl border border-dashed">
+                      <p className="font-medium">
+                        No completed projects found.
+                      </p>
                     </div>
                   );
-                })
-              ) : (
-                <div className="col-span-3 text-center text-gray-500 py-10">
-                  Loading recent projects...
-                </div>
-              )}
+                }
+              })()}
             </div>
           </div>
         </div>
@@ -455,71 +496,77 @@ const Home = () => {
       <ProjectSlider />
 
       <section className="py-10 bg-bg-color">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-serif text-text-primary mb-12">
-            Our Programs
-          </h2>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 className="text-3xl font-serif text-text-primary mb-12">
+      Our Programs
+    </h2>
 
-          {programsLoading ? (
-            <p className="text-primary font-semibold">Loading programs...</p>
-          ) : programsError ? (
-            <p className="text-red-500 font-semibold">{programsError}</p>
-          ) : programsList.length === 0 ? (
-            <p className="text-gray-500">No programs found.</p>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...programsList].reverse().map((program) => (
-                  <div
-                    key={program.id}
-                    className="bg-white rounded-xl border border-gray-100 text-left hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full"
-                  >
-                    <div className="h-48 overflow-hidden relative">
-                      <img
-                        src={getImageUrl(program.image_url)}
-                        alt={program.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src =
-                            "https://via.placeholder.com/800x500?text=Image+Not+Found";
-                        }}
-                      />
-                    </div>
-
-                    <div className="p-6 grow flex flex-col">
-                      <h3 className="text-xl font-serif font-bold text-text-primary mb-3 leading-tight">
-                        {program.title}
-                      </h3>
-
-                      <p className="text-gray-500 text-sm mb-6 grow">
-                        {program.description.length > 100
-                          ? `${program.description.slice(0, 100)}...`
-                          : program.description}
-                      </p>
-
-                      <Link
-                        to={`/programdetails/${program.slug}`}
-                        className="bg-primary hover:bg-[#5a6425] text-white px-6 py-2 rounded-full font-medium text-sm transition-colors self-start mt-auto inline-block"
-                      >
-                        Learn More
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+    {programsLoading ? (
+      <p className="text-primary font-semibold">Loading programs...</p>
+    ) : programsError ? (
+      <p className="text-red-500 font-semibold">{programsError}</p>
+    ) : programsList.length === 0 ? (
+      <p className="text-gray-500">No programs found.</p>
+    ) : (
+      <>
+        {/* Grid Box */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* 🔥 यहाँ [...programsList].reverse() एकदम परफेक्टली सेट है, 
+              ताकि जो प्रोग्राम सबसे लास्ट में ऐड हुआ है, वो यहाँ सबसे पहले दिखे। */}
+          {[...programsList].reverse().map((program) => (
+            <div
+              key={program.id}
+              className="bg-white rounded-xl border border-gray-100 text-left hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full"
+            >
+              {/* Image Container */}
+              <div className="h-48 overflow-hidden relative">
+                <img
+                  src={getImageUrl(program.image_url)}
+                  alt={program.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://via.placeholder.com/800x500?text=Image+Not+Found";
+                  }}
+                />
               </div>
 
-              <div className="mt-10">
+              {/* Content Area */}
+              <div className="p-6 grow flex flex-col">
+                <h3 className="text-xl font-serif font-bold text-text-primary mb-3 leading-tight">
+                  {program.title}
+                </h3>
+
+                <p className="text-gray-500 text-sm mb-6 grow">
+                  {program.description.length > 100
+                    ? `${program.description.slice(0, 100)}...`
+                    : program.description}
+                </p>
+
                 <Link
-                  to="/programs"
-                  className="inline-block border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-full font-semibold transition-colors"
+                  to={`/programdetails/${program.slug}`}
+                  className="bg-primary hover:bg-[#5a6425] text-white px-6 py-2 rounded-full font-medium text-sm transition-colors self-start mt-auto inline-block"
                 >
-                  View All Programs
+                  Learn More
                 </Link>
               </div>
-            </>
-          )}
+            </div>
+          ))}
         </div>
-      </section>
+
+        {/* Bottom Navigation Button */}
+        <div className="mt-10">
+          <Link
+            to="/programs"
+            className="inline-block border border-primary text-primary hover:bg-primary hover:text-white px-8 py-3 rounded-full font-semibold transition-colors"
+          >
+            View All Programs
+          </Link>
+        </div>
+      </>
+    )}
+  </div>
+</section>
 
       <Testimonials />
 
@@ -616,7 +663,9 @@ const Home = () => {
                       totalStates: totals.totalStates,
                       totalDistricts: totals.totalDistricts,
                       totalProjects: totals.totalProjects,
-                      totalBeneficiaries: totals.totalBeneficiaries ? formatCompact(totals.totalBeneficiaries) : mapTotals.totalBeneficiaries,
+                      totalBeneficiaries: totals.totalBeneficiaries
+                        ? formatCompact(totals.totalBeneficiaries)
+                        : mapTotals.totalBeneficiaries,
                     })
                   }
                 />
@@ -721,7 +770,11 @@ const Home = () => {
                     {/* 🔥 Dynamic State wise Completed Project Count calculation */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-105">
-                        {selectedMapState.projects?.filter(p => p.status?.toLowerCase() === 'completed' || p.is_completed).length || 0}
+                        {selectedMapState.projects?.filter(
+                          (p) =>
+                            p.status?.toLowerCase() === "completed" ||
+                            p.is_completed,
+                        ).length || 0}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800 uppercase tracking-tight">
@@ -800,11 +853,13 @@ const Home = () => {
                         </div>
                       </div>
                     </li>
-                    
+
                     {/* 🔥 Dynamic Live National Counter for Completed Projects */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        {globalCompletedCount > 0 ? globalCompletedCount : "45+"}
+                        {globalCompletedCount > 0
+                          ? globalCompletedCount
+                          : "45+"}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
@@ -819,7 +874,9 @@ const Home = () => {
                     {/* 🔥 Dynamic Live National Counter for Lives Impacted Summation */}
                     <li className="flex items-center gap-4 group">
                       <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-xl font-bold transition-transform group-hover:scale-110">
-                        {globalLivesImpactedSum > 0 ? formatCompact(globalLivesImpactedSum) : mapTotals.totalBeneficiaries}
+                        {globalLivesImpactedSum > 0
+                          ? formatCompact(globalLivesImpactedSum)
+                          : mapTotals.totalBeneficiaries}
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-800">
